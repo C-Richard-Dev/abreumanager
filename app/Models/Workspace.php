@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property string $uuid
@@ -24,5 +25,10 @@ class Workspace extends Model
                 $workspace->uuid = (string) Str::uuid();
             }
         });
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_workspaces');
     }
 }
