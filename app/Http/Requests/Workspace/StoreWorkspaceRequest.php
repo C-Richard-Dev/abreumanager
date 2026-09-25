@@ -12,7 +12,7 @@ class StoreWorkspaceRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,16 @@ class StoreWorkspaceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|unique:workspaces,name|max:255'
+            'name' => 'required|string|max:255'
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'O nome é obrigatório.',
+            'name.string' => 'Formato inválido.',
+            'name.max' => 'O nome do workspace não pode ter mais de 255 caracteres.',
         ];
     }
 }

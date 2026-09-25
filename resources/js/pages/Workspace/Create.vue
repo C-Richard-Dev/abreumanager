@@ -3,6 +3,7 @@ import { useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import Input from '@/components/ui/input/Input.vue'
 import Button from '@/components/ui/button/Button.vue'
+import { store } from '@/routes/workspaces'
 
 interface User {
     id: number
@@ -18,15 +19,15 @@ const page = usePage<{
     workspaces_count: number
 }>()
 
-const user = computed(() => page.props.auth.user)
 const workspacesCount = computed(() => page.props.workspaces_count)
-const workspaceName = computed(() => 'Workspace ' + (workspacesCount.value + 1))
 
 const form = useForm({
-    name: workspaceName.value,
+    name: '',
 })
 
-const submit = () => form.post('/workspaces')
+const submit = () => {
+    form.post(store.url())
+}
 </script>
 
 <template>
