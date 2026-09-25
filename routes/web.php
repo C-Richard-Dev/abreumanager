@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\HaveWorkspace;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
+use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -14,6 +15,8 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('workspace')->group(function () {
         Route::get('/create', FormCreateWorkspaceController::class)
             ->name('workspaces.create');
+        Route::post('/store', StoreWorkspaceController::class)
+            ->name('workspaces.store');
     });
 });
 
