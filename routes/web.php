@@ -15,7 +15,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('workspace')->group(function () {
         Route::get('/', ListWorkspaceController::class)
-            ->name('workspaces.index');
+            ->name('workspaces.index')
+            ->middleware(HaveWorkspace::class);
         Route::get('/create', FormCreateWorkspaceController::class)
             ->name('workspaces.create');
         Route::post('/store', StoreWorkspaceController::class)
