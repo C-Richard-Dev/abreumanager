@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\HaveWorkspace;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
+use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
 use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\ShowWorkspaceController;
@@ -24,6 +25,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('workspaces.show');
         Route::post('/store', StoreWorkspaceController::class)
             ->name('workspaces.store');
+        Route::get('/{workspaceUuid}/edit', FormEditWorkspaceController::class)
+            ->name('workspaces.edit');
     });
 });
 
