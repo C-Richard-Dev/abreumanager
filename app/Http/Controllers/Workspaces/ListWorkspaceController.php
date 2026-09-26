@@ -10,7 +10,7 @@ class ListWorkspaceController extends Controller
     public function __invoke(): \Inertia\Response
     {
         return inertia('Workspace/Index', [
-            'workspaces' => auth()->user()->workspaces
+            'workspaces' => auth()->user()->workspaces()->orderBy('created_at')->get()
         ]);
     }
 }
