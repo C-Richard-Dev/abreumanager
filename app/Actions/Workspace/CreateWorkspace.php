@@ -17,7 +17,9 @@ class CreateWorkspace
             ->where('name', 'like', $name . '%')
             ->count();
 
-        $name = $name . ($alreadyExists + 1);
+        if ($alreadyExists > 0) {
+            $name = $name . ($alreadyExists + 1);
+        }
 
         $workspace = Workspace::create([
             'name' => $name,
