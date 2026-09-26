@@ -14,6 +14,14 @@ defineProps<{
     workspace: Workspace;
 }>();
 
+function formatDate(date: string): string {
+    return new Date(date).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    })
+}   
+
 </script>
 
 <template>
@@ -24,5 +32,8 @@ defineProps<{
         <h2 class="font-semibold">
             {{ workspace.name }}
         </h2>
+        <p class="text-sm text-muted-foreground">
+            Criado em: {{ formatDate(workspace.created_at) }}
+        </p>
     </a>
 </template>
