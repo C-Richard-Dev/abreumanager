@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import { usePage } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 
 interface Workspace {
   uuid: string;
@@ -8,16 +9,13 @@ interface Workspace {
 }
 
 const page = usePage<{
-    workspaces: Workspace
+    workspace: Workspace
 }>()
 
 const workspace = page.props.workspace;
 
-defineOptions({
-  title: 'test',
-})
-
 </script>
 <template>
-    test
+    <Head title="Workspace" />
+    <h1>{{ workspace.name }}</h1>
 </template>

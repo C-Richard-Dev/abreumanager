@@ -10,7 +10,7 @@ class ShowWorkspaceController extends Controller
 {
     public function __invoke(string $workspaceUuid): \Inertia\Response
     {
-        $workspace = Workspace::findByUuid($workspaceUuid)
+        $workspace = Workspace::where('uuid', $workspaceUuid)
             ->firstOrFail();
 
         return inertia('Workspace/Show', [

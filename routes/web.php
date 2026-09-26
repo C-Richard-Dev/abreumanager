@@ -18,10 +18,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', ListWorkspaceController::class)
             ->name('workspaces.index')
             ->middleware(HaveWorkspace::class);
-        Route::get('/{workspaceUuid}', ShowWorkspaceController::class)
-            ->name('workspaces.show'); 
         Route::get('/create', FormCreateWorkspaceController::class)
             ->name('workspaces.create');
+        Route::get('/{workspaceUuid}', ShowWorkspaceController::class)
+            ->name('workspaces.show');
         Route::post('/store', StoreWorkspaceController::class)
             ->name('workspaces.store');
     });
