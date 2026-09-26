@@ -3,7 +3,7 @@
 import { usePage } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
 import { Head } from '@inertiajs/vue3';
-import { index } from '@/routes/workspaces'
+import { index, show } from '@/routes/workspaces'
 
 interface Workspace {
     id: number;

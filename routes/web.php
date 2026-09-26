@@ -5,6 +5,7 @@ use App\Http\Middleware\HaveWorkspace;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
 use App\Http\Controllers\Workspaces\StoreWorkspaceController;
+use App\Http\Controllers\Workspaces\ShowWorkspaceController;
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -17,6 +18,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', ListWorkspaceController::class)
             ->name('workspaces.index')
             ->middleware(HaveWorkspace::class);
+        Route::get('/{workspaceUuid}', ShowWorkspaceController::class)
+            ->name('workspaces.show'); 
         Route::get('/create', FormCreateWorkspaceController::class)
             ->name('workspaces.create');
         Route::post('/store', StoreWorkspaceController::class)

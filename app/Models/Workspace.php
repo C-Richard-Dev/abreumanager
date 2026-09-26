@@ -31,4 +31,14 @@ class Workspace extends Model
     {
         return $this->belongsToMany(User::class, 'user_workspaces');
     }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    public function links(): BelongsToMany
+    {
+        return $this->belongsToMany(Link::class);
+    }
 }
