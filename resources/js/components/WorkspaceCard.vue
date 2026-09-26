@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
-import { show } from '@/routes/workspaces';
+import { Link } from '@inertiajs/vue3';
+import { show, edit } from '@/routes/workspaces';
+import { Edit, Eye } from '@lucide/vue';
 
 interface Workspace {
     id: number;
@@ -25,9 +27,8 @@ function formatDate(date: string): string {
 </script>
 
 <template>
-    <a
-        :href="show(workspace.uuid).url"
-        class="block rounded-lg border p-4 transition hover:bg-accent"
+    <div
+        class="block rounded-lg border p-4 transition hover:bg-accent cursor-pointer"
     >
         <h2 class="font-semibold">
             {{ workspace.name }}
@@ -35,5 +36,19 @@ function formatDate(date: string): string {
         <p class="text-sm text-muted-foreground">
             Criado em: {{ formatDate(workspace.created_at) }}
         </p>
-    </a>
+        <Link
+            :href="show(workspace.uuid).url"
+            class="inline-block rounded-sm mt-4 border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+        >
+            Ver
+            <Eye class="inline-block ml-2" />
+        </Link>
+        <Link
+            :href="edit(workspace.uuid).url"
+            class="inline-block rounded-sm mt-4 border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+        >
+            Editar
+            <Edit class="inline-block ml-2" />
+        </Link>
+    </div>
 </template>
