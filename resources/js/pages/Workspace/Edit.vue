@@ -3,7 +3,9 @@ import { useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import Input from '@/components/ui/input/Input.vue'
 import Button from '@/components/ui/button/Button.vue'
-import { update } from '@/routes/workspaces'
+import { update, index } from '@/routes/workspaces'
+import { Link } from '@inertiajs/vue3'
+import { ArrowLeft } from '@lucide/vue'
 
 interface Workspace {
     id: number
@@ -40,6 +42,7 @@ const submit = () => {
             <p v-if="form.errors.name">
                 {{ form.errors.name }}
             </p>
+            
 
             <Button
                 type="submit"
@@ -47,6 +50,12 @@ const submit = () => {
             >
                 Editar
             </Button>
+            <Link
+                :href="index.url()"
+                class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm ml-3 leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+            > 
+                Cancelar
+            </Link>
         </form>
     </div>
 </template>
