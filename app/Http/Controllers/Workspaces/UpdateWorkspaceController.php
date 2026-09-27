@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Workspaces;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\UpdateWorkspaceRequest;
+use App\Http\Requests\Workspace\UpdateWorkspaceRequest;
 use App\Models\Workspace;
-use App\Actions\Workspaces\UpdateWorkspace;
+use App\Actions\Workspace\UpdateWorkspace;
 
 class UpdateWorkspaceController extends Controller
 {
@@ -16,7 +16,7 @@ class UpdateWorkspaceController extends Controller
         UpdateWorkspace $updateWorkspace
     ): RedirectResponse {
         $workspace = Workspace::where('uuid', $workspaceUuid)->firstOrFail();
-        $input = $request['name'];
+        $input = ['name' => $request['name']];
 
         $updateWorkspace->execute($workspace, $input);
 

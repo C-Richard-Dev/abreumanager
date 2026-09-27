@@ -5,7 +5,7 @@ namespace App\Http\Requests\Workspace;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreWorkspaceRequest extends FormRequest
+class UpdateWorkspaceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

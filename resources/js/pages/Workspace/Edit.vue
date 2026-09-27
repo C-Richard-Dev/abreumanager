@@ -3,7 +3,7 @@ import { useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import Input from '@/components/ui/input/Input.vue'
 import Button from '@/components/ui/button/Button.vue'
-import { store } from '@/routes/workspaces'
+import { update } from '@/routes/workspaces'
 
 interface Workspace {
     id: number
@@ -22,7 +22,7 @@ const form = useForm({
 })
 
 const submit = () => {
-    form.post(store.url())
+    form.put(update.url(workspace.value.uuid))
 }
 </script>
 
