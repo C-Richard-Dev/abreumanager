@@ -20,9 +20,10 @@ class UpdateWorkspaceController extends Controller
 
         $updateWorkspace->execute($workspace, $input);
 
-        return redirect()->route('workspaces.show', [
-                'workspaceUuid' => $workspace->uuid
-            ]
-        );
+        return redirect()
+            ->route('workspaces.show', [
+                    'workspaceUuid' => $workspace->uuid
+                ]
+            );
     }
 }
