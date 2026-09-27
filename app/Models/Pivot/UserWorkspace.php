@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Pivot;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

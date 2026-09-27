@@ -31,4 +31,14 @@ class Workspace extends Model
     {
         return $this->belongsToMany(User::class, 'user_workspaces');
     }
+
+    public function categories(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function links(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Link::class);
+    }
 }
