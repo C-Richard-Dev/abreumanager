@@ -8,6 +8,7 @@ use App\Http\Controllers\Workspaces\ListWorkspaceController;
 use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\ShowWorkspaceController;
 use App\Http\Controllers\Workspaces\UpdateWorkspaceController;
+use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -30,6 +31,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('workspaces.edit');
         Route::put('/{workspaceUuid}', UpdateWorkspaceController::class)
             ->name('workspaces.update');
+        Route::delete('/{workspaceUuid}', DeleteWorkspaceController::class)
+            ->name('workspaces.delete');
     });
 });
 

@@ -5,7 +5,6 @@ import Input from '@/components/ui/input/Input.vue'
 import Button from '@/components/ui/button/Button.vue'
 import { update, index } from '@/routes/workspaces'
 import { Link } from '@inertiajs/vue3'
-import { ArrowLeft } from '@lucide/vue'
 
 interface Workspace {
     id: number
