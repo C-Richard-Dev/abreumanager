@@ -7,6 +7,7 @@ use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
 use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\ShowWorkspaceController;
+use App\Http\Controllers\Workspaces\UpdateWorkspaceController;
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -27,6 +28,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('workspaces.store');
         Route::get('/{workspaceUuid}/edit', FormEditWorkspaceController::class)
             ->name('workspaces.edit');
+        Route::put('/{workspaceUuid}', UpdateWorkspaceController::class)
+            ->name('workspaces.update');
     });
 });
 
