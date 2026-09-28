@@ -3,9 +3,12 @@
 import { usePage } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
 import { Head } from '@inertiajs/vue3';
-import { index } from '@/routes/workspaces'
+import { index, create } from '@/routes/workspaces'
 import WorkspaceCard from '@/components/WorkspaceCard.vue';
 import { computed } from 'vue';
+import { Plus } from '@lucide/vue';
+import { Link } from '@inertiajs/vue3';
+
 
 interface Workspace {
     id: number;
@@ -40,6 +43,16 @@ const workspaces = computed(() => page.props.workspaces);
         title="Selecione um espaço de trabalho"
         ></Heading
     >
+    <div class="mb-4">
+        <Link
+            :href="create()"
+            class="inline-block rounded-sm border border-transparent ml-4 px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+        >
+            Criar
+            <Plus class="inline-block ml-2" />
+        </Link>
+    </div>
+    
     <p v-if="workspaces.length === 0" class="ml-4">
         Nenhum espaço de trabalho encontrado.
     </p>
