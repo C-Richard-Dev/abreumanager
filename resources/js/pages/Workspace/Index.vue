@@ -5,6 +5,7 @@ import Heading from '@/components/Heading.vue';
 import { Head } from '@inertiajs/vue3';
 import { index } from '@/routes/workspaces'
 import WorkspaceCard from '@/components/WorkspaceCard.vue';
+import { computed } from 'vue';
 
 interface Workspace {
     id: number;
@@ -29,7 +30,7 @@ const page = usePage<{
     workspaces: Workspace[]
 }>()
 
-const workspaces = page.props.workspaces;
+const workspaces = computed(() => page.props.workspaces);
 
 </script>
 <template>

@@ -31,8 +31,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('workspaces.edit');
         Route::put('/{workspaceUuid}', UpdateWorkspaceController::class)
             ->name('workspaces.update');
-        Route::delete('/{workspaceUuid}', DeleteWorkspaceController::class)
-            ->name('workspaces.delete');
+        Route::delete('/destroy/{workspaceUuid}', DeleteWorkspaceController::class)
+            ->name('workspaces.destroy');
     });
 });
 

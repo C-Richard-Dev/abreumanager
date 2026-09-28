@@ -1,9 +1,12 @@
-```vue
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-import { show, edit } from '@/routes/workspaces';
+import {
+    show,
+    edit,
+    destroy,
+} from '@/routes/workspaces';
 
 import { Edit, Eye, Trash2 } from '@lucide/vue';
 
@@ -17,7 +20,7 @@ interface Workspace {
     updated_at: string;
 }
 
-defineProps<{
+const props = defineProps<{
     workspace: Workspace;
 }>();
 
@@ -32,17 +35,16 @@ function formatDate(date: string): string {
 }
 
 function handleDelete() {
-    // Futuramente:
-    // delete(workspace.uuid)
+    router.delete(
+        destroy(props.workspace.uuid).url,
+    );
 
     isDeleteModalOpen.value = false;
 }
 </script>
 
 <template>
-    <div
-        class="block rounded-lg border p-4 transition hover:bg-accent"
-    >
+    <div class="block rounded-lg border p-4 transition hover:bg-accent">
         <h2 class="font-semibold">
             {{ workspace.name }}
         </h2>
@@ -91,4 +93,3 @@ function handleDelete() {
         />
     </div>
 </template>
-```
