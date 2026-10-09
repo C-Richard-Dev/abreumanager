@@ -34,6 +34,11 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/destroy/{workspaceUuid}', DeleteWorkspaceController::class)
             ->name('workspaces.destroy');
     });
+
+    Route::prefix('categories')->group(function () {
+        Route::post('/store', [App\Http\Controllers\Categories\StoreCategoryController::class])
+            ->name('categories.store');
+    });
 });
 
 require __DIR__.'/settings.php';
