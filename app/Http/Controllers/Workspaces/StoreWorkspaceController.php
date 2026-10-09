@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Workspaces;
 
+use App\Actions\Workspaces\CreateWorkspace;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Workspace\StoreWorkspaceRequest;
-use App\Actions\Workspace\CreateWorkspace;
+use App\Http\Requests\Workspaces\StoreWorkspaceRequest;
 use Illuminate\Http\RedirectResponse;
 
 class StoreWorkspaceController extends Controller
@@ -14,7 +14,7 @@ class StoreWorkspaceController extends Controller
         CreateWorkspace $createWorkspace
     ): RedirectResponse {
         $inputs = [
-            'name' => $request->input('name')
+            'name' => $request->input('name'),
         ];
         $createWorkspace->execute($inputs);
 

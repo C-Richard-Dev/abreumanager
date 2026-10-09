@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Workspace;
+namespace App\Http\Requests\Categories;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreWorkspaceRequest extends FormRequest
+class StoreCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,9 @@ class StoreWorkspaceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255'
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'workspace_id' => ['required', 'id'],
         ];
     }
 
@@ -31,8 +33,11 @@ class StoreWorkspaceRequest extends FormRequest
     {
         return [
             'name.required' => 'O nome é obrigatório.',
-            'name.string' => 'Formato inválido.',
-            'name.max' => 'O nome do workspace não pode ter mais de 255 caracteres.',
+            'name.string' => 'O nome deve ser uma string.',
+            'name.max' => 'O nome não pode ter mais de 255 caracteres.',
+            'description.string' => 'A descrição deve ser uma string.',
+            'workspace_id.required' => 'O ID do workspace é obrigatório.',
+            'workspace_id.id' => 'O ID do workspace deve ser um ID válido.',
         ];
     }
 }

@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\Workspaces;
 
+use App\Actions\Workspaces\DestroyWorkspace;
 use App\Http\Controllers\Controller;
-use App\Actions\Workspace\DestroyWorkspace;
-use Illuminate\Http\Request;
 use App\Models\Workspace;
 use Illuminate\Http\RedirectResponse;
 

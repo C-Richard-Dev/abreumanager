@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Workspace;
+namespace App\Http\Requests\Workspaces;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateWorkspaceRequest extends FormRequest
+class StoreWorkspaceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class UpdateWorkspaceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
         ];
     }
 
