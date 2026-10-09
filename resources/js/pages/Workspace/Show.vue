@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, Plus } from '@lucide/vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { ArrowLeft } from '@lucide/vue';
 import { index } from '@/routes/workspaces';
 import WorkspaceCategorySelector from '@/components/WorkspaceCategorySelector.vue';
 import WorkspaceLinksPanel from '@/components/WorkspaceLinksPanel.vue';
 
 interface Workspace {
+    id?: number;
     uuid: string;
     name: string;
 }
@@ -82,6 +83,14 @@ const visibleLinks = computed(() => {
 
     return activeCategory.value?.links ?? [];
 });
+
+function handleCategoryCreated(category: { id: number; uuid: string; name: string }) {
+    selectedCategoryId.value = category.id;
+
+    router.reload({
+        only: ['categories', 'links'],
+    });
+}
 </script>
 
 <template>
@@ -111,7 +120,9 @@ const visibleLinks = computed(() => {
             <WorkspaceCategorySelector
                 :categories="categoryOptions"
                 :selected-category-id="selectedCategoryId"
+                :workspace-uuid="workspace.uuid ?? null"
                 @select-category="selectedCategoryId = $event"
+                @category-created="handleCategoryCreated"
             />
 
             <WorkspaceLinksPanel

@@ -8,6 +8,14 @@ class CreateCategory
 {
     public function execute(array $inputs): Category
     {
-        return Category::create($inputs);
+        $name = rtrim($inputs['name']);
+        
+        $category = Category::create([
+            'name' => $name,
+            'description' => rtrim($inputs['description'] ?? ''),
+            'workspace_id' => $inputs['workspace_id'],
+        ]);
+
+        return $category;
     }
 }

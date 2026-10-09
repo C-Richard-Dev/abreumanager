@@ -36,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('categories')->group(function () {
-        Route::post('/store', [App\Http\Controllers\Categories\StoreCategoryController::class])
+        Route::post('{workspaceUuid}/store', App\Http\Controllers\Categories\StoreCategoryController::class)
             ->name('categories.store');
     });
 });

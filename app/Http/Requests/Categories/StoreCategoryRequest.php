@@ -25,7 +25,6 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'workspace_id' => ['required', 'id'],
         ];
     }
 
@@ -36,8 +35,6 @@ class StoreCategoryRequest extends FormRequest
             'name.string' => 'O nome deve ser uma string.',
             'name.max' => 'O nome não pode ter mais de 255 caracteres.',
             'description.string' => 'A descrição deve ser uma string.',
-            'workspace_id.required' => 'O ID do workspace é obrigatório.',
-            'workspace_id.id' => 'O ID do workspace deve ser um ID válido.',
         ];
     }
 }

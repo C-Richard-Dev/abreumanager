@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { ChevronDown, Plus } from '@lucide/vue';
+import WorkspaceCategoryCreateDialog from '@/components/WorkspaceCategoryCreateDialog.vue';
 
 interface CategoryItem {
     id: number;
@@ -13,11 +14,15 @@ interface CategoryItem {
 const props = defineProps<{
     categories: CategoryItem[];
     selectedCategoryId: number | null;
+    workspaceUuid: string | null;
 }>();
 
 const emit = defineEmits<{
     (event: 'select-category', categoryId: number): void;
+    (event: 'category-created', category: { id: number; uuid: string; name: string }): void;
 }>();
+
+const isCreateCategoryDialogOpen = ref(false);
 
 const selectedCategory = computed(() => {
     return props.categories.find((category) => category.id === props.selectedCategoryId) ?? props.categories[0] ?? null;
@@ -32,6 +37,10 @@ function handleCategoryChange(event: Event) {
     }
 
     emit('select-category', nextValue);
+}
+
+function handleCategoryCreated(category: { id: number; uuid: string; name: string }) {
+    emit('category-created', category);
 }
 </script>
 
@@ -59,9 +68,16 @@ function handleCategoryChange(event: Event) {
         <button
             type="button"
             class="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted"
+            @click="isCreateCategoryDialogOpen = true"
         >
             <Plus class="size-4" />
             Criar categoria
         </button>
     </div>
+
+    <WorkspaceCategoryCreateDialog
+        v-model:is-open="isCreateCategoryDialogOpen"
+        :workspace-uuid="workspaceUuid"
+        @created="handleCategoryCreated"
+    />
 </template>

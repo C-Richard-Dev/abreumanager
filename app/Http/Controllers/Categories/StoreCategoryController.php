@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Categories;
 use App\Actions\Categories\CreateCategory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Categories\StoreCategoryRequest;
-use App\Models\Category;
+use App\Models\Workspace;
 use Illuminate\Http\JsonResponse;
 
 class StoreCategoryController extends Controller
@@ -15,8 +15,7 @@ class StoreCategoryController extends Controller
         string $workspaceUuid,
         CreateCategory $createCategory
     ): JsonResponse {
-        $workspace = Category::where('workspace_id', $workspaceUuid)
-            ->first();
+        $workspace = Workspace::where('uuid', $workspaceUuid)->firstOrFail();
 
         $inputs = [
             'name' => $request->input('name'),
