@@ -128,6 +128,9 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
             <WorkspaceLinksPanel
                 :category-name="activeCategory?.name ?? 'Todas'"
                 :links="visibleLinks"
+                :workspace-uuid="workspace.uuid ?? null"
+                :selected-category-id="selectedCategoryId"
+                :categories="categories"
             />
         </div>
     </div>
