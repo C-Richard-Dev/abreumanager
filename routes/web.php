@@ -38,6 +38,10 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('categories')->group(function () {
         Route::post('{workspaceUuid}/store', App\Http\Controllers\Categories\StoreCategoryController::class)
             ->name('categories.store');
+        Route::put('{categoryUuid}/update', App\Http\Controllers\Categories\UpdateCategoryController::class)
+            ->name('categories.update');
+        // Route::delete('{categoryUuid}/destroy', App\Http\Controllers\Categories\DeleteCategoryController::class)
+        //     ->name('categories.destroy');
     });
 });
 
