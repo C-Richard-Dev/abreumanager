@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Categories;
 
-use App\Http\Controllers\Controller;
-use App\Requests\UpdateCategoryRequest;
-use App\Models\Category;
 use App\Actions\Categories\UpdateCategory;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Categories\UpdateCategoryRequest;
+use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 
 class UpdateCategoryController extends Controller
 {
     public function __invoke(
-        UpdateCategoryRequest $request, 
+        UpdateCategoryRequest $request,
         string $categoryUuid,
         UpdateCategory $updateCategory
-    ): \Illuminate\Http\JsonResponse {
+    ): JsonResponse {
         $category = Category::where('uuid', $categoryUuid)->firstOrFail();
 
         $inputs = [
