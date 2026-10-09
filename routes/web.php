@@ -40,8 +40,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('categories.store');
         Route::put('{categoryUuid}/update', App\Http\Controllers\Categories\UpdateCategoryController::class)
             ->name('categories.update');
-        // Route::delete('{categoryUuid}/destroy', App\Http\Controllers\Categories\DeleteCategoryController::class)
-        //     ->name('categories.destroy');
+        Route::delete('{categoryUuid}/destroy', App\Http\Controllers\Categories\DeleteCategoryController::class)
+            ->name('categories.destroy');
     });
 });
 
