@@ -43,6 +43,15 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('{categoryUuid}/destroy', App\Http\Controllers\Categories\DeleteCategoryController::class)
             ->name('categories.destroy');
     });
+
+    Route::prefix('links')->group(function () {
+        Route::post('{workspaceUuid}/store', App\Http\Controllers\Links\StoreLinkController::class)
+            ->name('links.store');
+        Route::put('{linkUuid}/update', App\Http\Controllers\Links\UpdateLinkController::class)
+            ->name('links.update');
+        Route::delete('{linkUuid}/destroy', App\Http\Controllers\Links\DestroyLinkController::class)
+            ->name('links.destroy');
+    });
 });
 
 require __DIR__.'/settings.php';
