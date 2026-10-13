@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Link as LinkIcon, Pencil, Plus, Trash2, Copy } from '@lucide/vue';
+import { Link as LinkIcon, Pencil, Plus, Trash2, Copy, ExternalLink } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
 
 
@@ -64,6 +64,10 @@ const { copy } = useClipboard();
 function copyLink(link: LinkItem) {
     copy(link.url);
     toast.success('Link copiado para a área de transferência.');
+}
+
+function goToLink(link: LinkItem) {
+    window.open(link.url, '_blank', 'noopener,noreferrer');
 }
 
 function getCsrfToken(): string {
@@ -368,8 +372,18 @@ async function confirmDeleteLink() {
                         <button
                             type="button"
                             class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
+                            @click="goToLink(linkItem)"
+                            aria-label="Ir para o site"
+                            title="Ir para o site"
+                        >
+                            <ExternalLink class="size-3.5 text-purple-500" />
+                        </button>
+                        <button
+                            type="button"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
                             @click="copyLink(linkItem)"
                             aria-label="Copiar"
+                            title="Copiar"
                         >
                             <Copy class="size-3.5 text-blue-500" />
                         </button>
@@ -378,6 +392,7 @@ async function confirmDeleteLink() {
                             class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
                             @click="openEditLink(linkItem)"
                             aria-label="Editar link"
+                            title="Editar link"
                         >
                             <Pencil class="size-3.5" />
                         </button>
@@ -387,6 +402,7 @@ async function confirmDeleteLink() {
                             class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
                             @click="openDeleteLink(linkItem)"
                             aria-label="Excluir link"
+                            title="Excluir link"
                         >
                             <Trash2 class="size-3.5 text-red-500" />
                         </button>
