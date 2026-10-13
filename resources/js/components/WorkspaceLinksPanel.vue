@@ -305,7 +305,7 @@ async function confirmDeleteLink() {
                             @click="copyLink(linkItem)"
                             aria-label="Copiar"
                         >
-                            <Copy class="size-3.5" />
+                            <Copy class="size-3.5 text-blue-500" />
                         </button>
                         <button
                             type="button"
@@ -322,7 +322,7 @@ async function confirmDeleteLink() {
                             @click="openDeleteLink(linkItem)"
                             aria-label="Excluir link"
                         >
-                            <Trash2 class="size-3.5" />
+                            <Trash2 class="size-3.5 text-red-500" />
                         </button>
                     </div>
                 </div>
