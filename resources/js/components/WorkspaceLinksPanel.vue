@@ -30,12 +30,27 @@ interface CategoryOption {
     name: string;
 }
 
+interface PaginationInfo {
+    current_page: number;
+    last_page: number;
+    total: number;
+    from: number;
+    to: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
+}
+
 const props = defineProps<{
     categoryName: string;
     links: LinkItem[];
     workspaceUuid: string | null;
     selectedCategoryId: number | null;
     categories: CategoryOption[];
+    pagination: PaginationInfo;
+}>();
+
+const emit = defineEmits<{
+    (event: 'page-change', page: number): void;
 }>();
 
 const isCreateDialogOpen = ref(false);
@@ -405,6 +420,31 @@ async function confirmDeleteLink() {
                             title="Excluir link"
                         >
                             <Trash2 class="size-3.5 text-red-500" />
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="pagination && pagination.last_page > 1" class="flex items-center justify-between border-t border-border pt-3">
+                    <span class="text-xs text-muted-foreground">
+                        {{ pagination.from }}-{{ pagination.to }} de {{ pagination.total }}
+                    </span>
+
+                    <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            class="inline-flex items-center justify-center rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+                            :disabled="pagination.current_page <= 1"
+                            @click="emit('page-change', pagination.current_page - 1)"
+                        >
+                            Anterior
+                        </button>
+                        <button
+                            type="button"
+                            class="inline-flex items-center justify-center rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+                            :disabled="pagination.current_page >= pagination.last_page"
+                            @click="emit('page-change', pagination.current_page + 1)"
+                        >
+                            Próxima
                         </button>
                     </div>
                 </div>

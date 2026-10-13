@@ -27,44 +27,68 @@ interface LinkItem {
     category_id?: number | null;
 }
 
+interface LinksPage {
+    data: LinkItem[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
+}
+
 const page = usePage<{
     workspace: Workspace;
     categories: Category[];
-    links: LinkItem[];
+    links: LinksPage | LinkItem[];
+    selectedCategoryId?: number | null;
 }>();
 
 const workspace = computed(() => page.props.workspace);
 const categories = computed(() => page.props.categories ?? []);
-const links = computed(() => page.props.links ?? []);
-const selectedCategoryId = ref<number | null>(null);
+const linksPage = computed<LinksPage>(() => {
+    const rawLinks = page.props.links ?? { data: [] };
+
+    if (Array.isArray(rawLinks)) {
+        return {
+            data: rawLinks,
+            current_page: 1,
+            last_page: 1,
+            per_page: rawLinks.length || 10,
+            total: rawLinks.length,
+            from: rawLinks.length > 0 ? 1 : 0,
+            to: rawLinks.length,
+            prev_page_url: null,
+            next_page_url: null,
+        };
+    }
+
+    return {
+        data: rawLinks.data ?? [],
+        current_page: rawLinks.current_page ?? 1,
+        last_page: rawLinks.last_page ?? 1,
+        per_page: rawLinks.per_page ?? 10,
+        total: rawLinks.total ?? 0,
+        from: rawLinks.from ?? 0,
+        to: rawLinks.to ?? 0,
+        prev_page_url: rawLinks.prev_page_url ?? null,
+        next_page_url: rawLinks.next_page_url ?? null,
+    };
+});
+const links = computed(() => linksPage.value.data ?? []);
+const selectedCategoryId = ref<number>(page.props.selectedCategoryId ?? 0);
 
 const categoryOptions = computed(() => {
-    const normalized = categories.value.map((category) => ({
+    return categories.value.map((category) => ({
         ...category,
         links: links.value.filter((link) => link.category_id === category.id),
     }));
-
-    const uncategorized = links.value.filter((link) => !link.category_id);
-
-    if (uncategorized.length > 0) {
-        normalized.unshift({
-            id: 0,
-            uuid: 'uncategorized',
-            name: 'Sem categoria',
-            description: 'Links ainda não agrupados',
-            links: uncategorized,
-        });
-    }
-
-    if (selectedCategoryId.value === null && normalized.length > 0) {
-        selectedCategoryId.value = normalized[0].id;
-    }
-
-    return normalized;
 });
 
 const activeCategory = computed(() => {
-    if (selectedCategoryId.value === null || selectedCategoryId.value === 0) {
+    if (selectedCategoryId.value === 0) {
         return {
             id: 0,
             uuid: 'all',
@@ -76,20 +100,35 @@ const activeCategory = computed(() => {
     return categoryOptions.value.find((category) => category.id === selectedCategoryId.value) ?? null;
 });
 
-const visibleLinks = computed(() => {
-    if (!selectedCategoryId.value || selectedCategoryId.value === 0) {
-        return links.value;
+const visibleLinks = computed(() => links.value);
+
+function navigateToPage(pageNumber: number) {
+    const params = new URLSearchParams(window.location.search);
+
+    if (selectedCategoryId.value === 0) {
+        params.delete('category_id');
+    } else {
+        params.set('category_id', String(selectedCategoryId.value));
     }
 
-    return activeCategory.value?.links ?? [];
-});
+    params.set('page', String(pageNumber));
+
+    router.get(`${window.location.pathname}?${params.toString()}`, {}, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['categories', 'links', 'selectedCategoryId'],
+    });
+}
 
 function handleCategoryCreated(category: { id: number; uuid: string; name: string }) {
     selectedCategoryId.value = category.id;
 
-    router.reload({
-        only: ['categories', 'links'],
-    });
+    navigateToPage(1);
+}
+
+function handleCategorySelected(categoryId: number) {
+    selectedCategoryId.value = categoryId;
+    navigateToPage(1);
 }
 </script>
 
@@ -121,7 +160,7 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
                 :categories="categoryOptions"
                 :selected-category-id="selectedCategoryId"
                 :workspace-uuid="workspace.uuid ?? null"
-                @select-category="selectedCategoryId = $event"
+                @select-category="handleCategorySelected"
                 @category-created="handleCategoryCreated"
             />
 
@@ -131,6 +170,8 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
                 :workspace-uuid="workspace.uuid ?? null"
                 :selected-category-id="selectedCategoryId"
                 :categories="categories"
+                :pagination="linksPage"
+                @page-change="navigateToPage"
             />
         </div>
     </div>

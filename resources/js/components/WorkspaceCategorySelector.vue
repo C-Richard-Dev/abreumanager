@@ -50,7 +50,7 @@ const selectedCategory = computed(() => {
 });
 
 const selectedLabel = computed(() => {
-    if (props.selectedCategoryId === null) {
+    if (props.selectedCategoryId === null || props.selectedCategoryId === 0) {
         return 'Todas';
     }
 
