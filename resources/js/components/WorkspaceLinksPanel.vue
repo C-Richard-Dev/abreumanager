@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Link as LinkIcon, Pencil, Plus, Trash2 } from '@lucide/vue';
+import { Link as LinkIcon, Pencil, Plus, Trash2, Copy } from '@lucide/vue';
+import { useClipboard } from '@vueuse/core';
+
+
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -54,6 +57,13 @@ const defaultCategoryId = computed(() => {
 
     return null;
 });
+
+const { copy } = useClipboard();
+
+function copyLink(link: LinkItem) {
+    copy(link.url);
+    toast.success('Link copiado para a área de transferência.');
+}
 
 function getCsrfToken(): string {
     const cookie = document.cookie
@@ -289,6 +299,14 @@ async function confirmDeleteLink() {
                     </div>
 
                     <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
+                            @click="copyLink(linkItem)"
+                            aria-label="Copiar"
+                        >
+                            <Copy class="size-3.5" />
+                        </button>
                         <button
                             type="button"
                             class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
