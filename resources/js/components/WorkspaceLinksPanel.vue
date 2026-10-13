@@ -47,10 +47,12 @@ const props = defineProps<{
     selectedCategoryId: number | null;
     categories: CategoryOption[];
     pagination: PaginationInfo;
+    searchQuery?: string;
 }>();
 
 const emit = defineEmits<{
     (event: 'page-change', page: number): void;
+    (event: 'search-change', query: string): void;
 }>();
 
 const isCreateDialogOpen = ref(false);
@@ -321,13 +323,25 @@ async function confirmDeleteLink() {
             </button>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
             <h2 class="text-xl font-semibold tracking-tight text-foreground">
                 {{ categoryName }}
             </h2>
         </div>
 
-        <div class="flex flex-1 items-center justify-center">
+        <div class="mb-4">
+            <div class="flex w-full items-center gap-2 rounded-md border border-border bg-background px-3 py-2.5">
+                <input
+                    :value="searchQuery ?? ''"
+                    type="search"
+                    placeholder="Pesquisar por nome ou link"
+                    class="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    @input="emit('search-change', ($event.target as HTMLInputElement).value)"
+                />
+            </div>
+        </div>
+
+        <div class="w-full">
             <div
                 v-if="links.length === 0"
                 class="flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center"
@@ -336,10 +350,10 @@ async function confirmDeleteLink() {
                     <LinkIcon class="size-5" />
                 </div>
                 <p class="text-lg font-medium text-foreground">
-                    Nenhum link nesta categoria
+                    Nenhum link encontrado
                 </p>
                 <p class="mt-2 max-w-md text-sm text-muted-foreground">
-                    Adicione novos links para começar a organizar seu workspace.
+                    Tente outro termo de busca ou adicione um novo link.
                 </p>
             </div>
 

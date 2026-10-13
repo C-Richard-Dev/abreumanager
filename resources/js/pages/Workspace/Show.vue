@@ -44,10 +44,12 @@ const page = usePage<{
     categories: Category[];
     links: LinksPage | LinkItem[];
     selectedCategoryId?: number | null;
+    searchQuery?: string;
 }>();
 
 const workspace = computed(() => page.props.workspace);
 const categories = computed(() => page.props.categories ?? []);
+const searchTerm = ref(page.props.searchQuery ?? '');
 const linksPage = computed<LinksPage>(() => {
     const rawLinks = page.props.links ?? { data: [] };
 
@@ -102,7 +104,7 @@ const activeCategory = computed(() => {
 
 const visibleLinks = computed(() => links.value);
 
-function navigateToPage(pageNumber: number) {
+function navigateToPage(pageNumber: number, nextSearchTerm = searchTerm.value) {
     const params = new URLSearchParams(window.location.search);
 
     if (selectedCategoryId.value === 0) {
@@ -111,13 +113,24 @@ function navigateToPage(pageNumber: number) {
         params.set('category_id', String(selectedCategoryId.value));
     }
 
+    if (nextSearchTerm.trim()) {
+        params.set('search', nextSearchTerm.trim());
+    } else {
+        params.delete('search');
+    }
+
     params.set('page', String(pageNumber));
 
     router.get(`${window.location.pathname}?${params.toString()}`, {}, {
         preserveScroll: true,
         preserveState: true,
-        only: ['categories', 'links', 'selectedCategoryId'],
+        only: ['categories', 'links', 'selectedCategoryId', 'searchQuery'],
     });
+}
+
+function handleSearchChange(value: string) {
+    searchTerm.value = value;
+    navigateToPage(1, value);
 }
 
 function handleCategoryCreated(category: { id: number; uuid: string; name: string }) {
@@ -171,7 +184,9 @@ function handleCategorySelected(categoryId: number) {
                 :selected-category-id="selectedCategoryId"
                 :categories="categories"
                 :pagination="linksPage"
+                :search-query="searchTerm"
                 @page-change="navigateToPage"
+                @search-change="handleSearchChange"
             />
         </div>
     </div>
