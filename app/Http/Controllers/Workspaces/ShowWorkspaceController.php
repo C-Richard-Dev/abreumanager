@@ -17,7 +17,7 @@ class ShowWorkspaceController extends Controller
         $search = trim((string) $request->query('search', ''));
         $page = max(1, (int) $request->query('page', 1));
 
-        $linksQuery = $workspace->links()->orderBy('created_at', 'desc');
+        $linksQuery = $workspace->links()->with('category')->orderBy('created_at', 'desc');
 
         if ($selectedCategoryId !== null && $selectedCategoryId !== '' && $selectedCategoryId !== '0') {
             $linksQuery->where('category_id', (int) $selectedCategoryId);

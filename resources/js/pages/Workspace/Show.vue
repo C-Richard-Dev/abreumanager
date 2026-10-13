@@ -25,6 +25,11 @@ interface LinkItem {
     name: string | null;
     url: string;
     category_id?: number | null;
+    category?: {
+        id?: number;
+        uuid?: string;
+        name?: string | null;
+    } | null;
 }
 
 interface LinksPage {

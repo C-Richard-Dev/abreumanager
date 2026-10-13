@@ -21,6 +21,11 @@ interface LinkItem {
     uuid: string;
     name: string | null;
     url: string;
+    category?: {
+        id?: number;
+        uuid?: string;
+        name?: string | null;
+    } | null;
     category_id?: number | null;
 }
 
@@ -154,6 +159,16 @@ function hasFaviconError(uuid: string): boolean {
 
 function onFaviconError(uuid: string) {
     faviconErrors.value[uuid] = true;
+}
+
+function getCategoryName(linkItem: LinkItem): string {
+    if (linkItem.category?.name) {
+        return linkItem.category.name;
+    }
+
+    const category = props.categories.find((item) => item.id === linkItem.category_id);
+
+    return category?.name ?? 'Sem categoria';
 }
 
 function resetForm() {
@@ -386,6 +401,13 @@ async function confirmDeleteLink() {
                             <p class="truncate text-sm font-medium text-foreground">
                                 {{ linkItem.name || getDomain(linkItem.url) }}
                             </p>
+
+                            <div class="mt-1 flex items-center gap-2">
+                                <span class="inline-flex max-w-full items-center rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                                    {{ getCategoryName(linkItem) }}
+                                </span>
+                            </div>
+
                             <a
                                 :href="linkItem.url"
                                 target="_blank"
