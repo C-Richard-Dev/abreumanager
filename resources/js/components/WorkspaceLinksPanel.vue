@@ -44,6 +44,7 @@ const isDeleteDialogOpen = ref(false);
 const isSubmitting = ref(false);
 const editingLink = ref<LinkItem | null>(null);
 const deletingLink = ref<LinkItem | null>(null);
+const faviconErrors = ref<Record<string, boolean>>({});
 const form = ref({
     name: '',
     url: '',
@@ -77,10 +78,61 @@ function getCsrfToken(): string {
     return decodeURIComponent(cookie.split('=')[1]);
 }
 
+function getDomain(value: string): string {
+    try {
+        const url = new URL(value);
+        const domain = url.hostname.replace(/^www\./i, '');
+
+        return domain || 'Link';
+    } catch {
+        return value
+            .replace(/^https?:\/\//i, '')
+            .replace(/^www\./i, '')
+            .split('/')[0]
+            .trim() || 'Link';
+    }
+}
+
+function getFaviconUrl(value: string): string {
+    const domain = getDomain(value);
+
+    if (!domain || domain === 'Link') {
+        return '';
+    }
+
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
+}
+
 function getInitials(value: string): string {
-    return value
+    const normalized = value
+        .trim()
+        .replace(/^https?:\/\//i, '')
+        .replace(/^www\./i, '')
+        .replace(/\?.*$/, '')
+        .replace(/\/.*$/, '')
+        .replace(/\.[a-z]{2,}$/i, '')
+        .replace(/[^a-zA-Z0-9]/g, ' ')
+        .trim();
+
+    if (!normalized) {
+        return 'L';
+    }
+
+    return normalized
+        .split(/\s+/)
+        .filter(Boolean)
         .slice(0, 2)
+        .map((part) => part.charAt(0))
+        .join('')
         .toUpperCase();
+}
+
+function hasFaviconError(uuid: string): boolean {
+    return Boolean(faviconErrors.value[uuid]);
+}
+
+function onFaviconError(uuid: string) {
+    faviconErrors.value[uuid] = true;
 }
 
 function resetForm() {
@@ -276,22 +328,36 @@ async function confirmDeleteLink() {
                 <div
                     v-for="linkItem in links"
                     :key="linkItem.uuid"
-                    class="flex items-center justify-between gap-3 rounded-sm border border-border bg-background p-3"
+                    class="group flex items-center justify-between gap-3 rounded-md border border-border bg-background p-3 transition-colors hover:border-muted-foreground/60 hover:bg-muted/20"
                 >
                     <div class="flex min-w-0 items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-sm bg-muted text-xs font-semibold text-foreground">
-                            {{ getInitials(linkItem.name || linkItem.url) }}
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border/80 bg-muted/70 shadow-inner">
+                            <img
+                                v-if="!hasFaviconError(linkItem.uuid)"
+                                :src="getFaviconUrl(linkItem.url)"
+                                :alt="linkItem.name || getDomain(linkItem.url)"
+                                class="h-full w-full object-cover"
+                                loading="lazy"
+                                @error="onFaviconError(linkItem.uuid)"
+                            />
+
+                            <span
+                                v-else
+                                class="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-background text-[10px] font-semibold tracking-wide text-foreground"
+                            >
+                                {{ getInitials(linkItem.name || linkItem.url) }}
+                            </span>
                         </div>
 
                         <div class="min-w-0">
                             <p class="truncate text-sm font-medium text-foreground">
-                                {{ linkItem.name || 'Link sem nome' }}
+                                {{ linkItem.name || getDomain(linkItem.url) }}
                             </p>
                             <a
                                 :href="linkItem.url"
                                 target="_blank"
                                 rel="noreferrer"
-                                class="mt-1 block truncate text-xs text-muted-foreground hover:text-foreground"
+                                class="mt-1 block truncate text-xs text-muted-foreground transition hover:text-foreground"
                             >
                                 {{ linkItem.url }}
                             </a>
