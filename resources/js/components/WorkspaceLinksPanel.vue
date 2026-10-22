@@ -323,7 +323,7 @@ async function confirmDeleteLink() {
 </script>
 
 <template>
-    <section class="flex h-full min-h-[480px] flex-col rounded-xl border border-border bg-background p-3 shadow-sm">
+    <section class="flex h-[530px] flex-col rounded-xl border border-border bg-background p-3 shadow-sm">
         <div class="mb-3 flex items-center justify-between border-b border-border pb-3">
             <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground">
                 Visualização
@@ -341,7 +341,7 @@ async function confirmDeleteLink() {
 
         <div class="mb-3">
             <h2 class="text-xl font-semibold tracking-tight text-foreground">
-                {{ categoryName }}
+                {{ categoryName }} ({{ links.length }})
             </h2>
         </div>
 
@@ -358,7 +358,7 @@ async function confirmDeleteLink() {
             </div>
         </div>
 
-        <div class="w-full">
+        <div class="flex min-h-0 w-full flex-1 flex-col">
             <div
                 v-if="links.length === 0"
                 class="flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center"
@@ -374,12 +374,13 @@ async function confirmDeleteLink() {
                 </p>
             </div>
 
-            <div v-else class="w-full space-y-3">
-                <div
-                    v-for="linkItem in links"
-                    :key="linkItem.uuid"
-                    class="group flex items-center justify-between gap-3 rounded-md border border-border bg-background p-3 transition-colors hover:border-muted-foreground/60 hover:bg-muted/20"
-                >
+            <div v-else class="flex min-h-0 w-full flex-1 flex-col">
+                <div class="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+                    <div
+                        v-for="linkItem in links"
+                        :key="linkItem.uuid"
+                        class="group flex items-center justify-between gap-3 rounded-md border border-border bg-background p-3 transition-colors hover:border-muted-foreground/60 hover:bg-muted/20"
+                    >
                     <div class="flex min-w-0 items-center gap-3">
                         <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border/80 bg-muted/70 shadow-inner">
                             <img
@@ -460,9 +461,10 @@ async function confirmDeleteLink() {
                             <Trash2 class="size-3.5 text-red-500" />
                         </button>
                     </div>
+                    </div>
                 </div>
 
-                <div v-if="pagination && pagination.last_page > 1" class="flex items-center justify-between border-t border-border pt-3">
+                <div v-if="pagination && pagination.last_page > 1" class="mt-3 flex shrink-0 items-center justify-between border-t border-border pt-3">
                     <span class="text-xs text-muted-foreground">
                         {{ pagination.from }}-{{ pagination.to }} de {{ pagination.total }}
                     </span>
