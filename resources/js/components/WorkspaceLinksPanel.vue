@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { Link as LinkIcon, Pencil, Plus, Trash2, Copy, ExternalLink, Search } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
+import { destroy as destroyLink, store as storeLink, update as updateLink } from '@/routes/links';
 
 
 import { toast } from 'vue-sonner';
@@ -244,15 +245,14 @@ async function submitLink() {
     };
 
     const endpoint = editingLink.value
-        ? `/links/${editingLink.value.uuid}/update`
-        : `/links/${props.workspaceUuid}/store`;
-    const method = editingLink.value ? 'PUT' : 'POST';
+        ? updateLink({ linkUuid: editingLink.value.uuid })
+        : storeLink({ workspaceUuid: props.workspaceUuid });
 
     try {
         isSubmitting.value = true;
 
-        const response = await fetch(endpoint, {
-            method,
+        const response = await fetch(endpoint.url, {
+            method: endpoint.method,
             credentials: 'same-origin',
             headers: {
                 Accept: 'application/json',
@@ -293,8 +293,9 @@ async function confirmDeleteLink() {
     try {
         isSubmitting.value = true;
 
-        const response = await fetch(`/links/${deletingLink.value.uuid}/destroy`, {
-            method: 'DELETE',
+        const endpoint = destroyLink({ linkUuid: deletingLink.value.uuid });
+        const response = await fetch(endpoint.url, {
+            method: endpoint.method,
             credentials: 'same-origin',
             headers: {
                 Accept: 'application/json',
