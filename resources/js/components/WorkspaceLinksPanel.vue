@@ -4,6 +4,7 @@ import { router } from '@inertiajs/vue3';
 import { Link as LinkIcon, Pencil, Plus, Trash2, Copy, ExternalLink, Search } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
 import { destroy as destroyLink, store as storeLink, update as updateLink } from '@/routes/links';
+import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 
 
 import { toast } from 'vue-sonner';
@@ -375,7 +376,7 @@ async function confirmDeleteLink() {
             </div>
 
             <div v-else class="flex min-h-0 w-full flex-1 flex-col">
-                <div class="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+                <ScrollArea class="flex-1 space-y-3 pr-1">
                     <div
                         v-for="linkItem in links"
                         :key="linkItem.uuid"
@@ -462,7 +463,7 @@ async function confirmDeleteLink() {
                         </button>
                     </div>
                     </div>
-                </div>
+                </ScrollArea>
 
                 <div v-if="pagination && pagination.last_page > 1" class="mt-3 flex shrink-0 items-center justify-between border-t border-border pt-3">
                     <span class="text-xs text-muted-foreground">
