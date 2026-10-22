@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Actions\Workspace;
+namespace App\Actions\Workspaces;
 
-use App\Models\User;
-use App\Models\Workspace;
 use App\Models\Pivot\UserWorkspace;
+use App\Models\Workspace;
 
 class CreateWorkspace
 {

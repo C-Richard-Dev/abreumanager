@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Workspaces;
 
+use App\Actions\Workspaces\UpdateWorkspace;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Workspace\UpdateWorkspaceRequest;
+use App\Http\Requests\Workspaces\UpdateWorkspaceRequest;
 use App\Models\Workspace;
-use App\Actions\Workspace\UpdateWorkspace;
+use Illuminate\Http\RedirectResponse;
 
 class UpdateWorkspaceController extends Controller
 {
     public function __invoke(
-        UpdateWorkspaceRequest $request, 
+        UpdateWorkspaceRequest $request,
         string $workspaceUuid,
         UpdateWorkspace $updateWorkspace
     ): RedirectResponse {
@@ -22,8 +22,7 @@ class UpdateWorkspaceController extends Controller
 
         return redirect()
             ->route('workspaces.show', [
-                    'workspaceUuid' => $workspace->uuid
-                ]
-            );
+                'workspaceUuid' => $workspace->uuid,
+            ]);
     }
 }

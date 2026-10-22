@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Actions\Workspace;
+namespace App\Actions\Workspaces;
 
 use App\Models\Workspace;
 
 class UpdateWorkspace
 {
     public function execute(
-        Workspace $workspace, 
+        Workspace $workspace,
         array $input
     ): Workspace {
         $workspace->update(['name' => $input['name']]);
+
         return $workspace;
     }
 }

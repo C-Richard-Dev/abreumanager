@@ -16,7 +16,7 @@ use App\Models\Workspace;
  * @property \Illuminate\Support\Carbon $updated_at
  * @property int $workspace_id
  */
-#[Fillable(['uuid', 'name', 'description'])]
+#[Fillable(['uuid', 'name', 'description', 'workspace_id'])]
 class Category extends Model
 {
     protected static function booted(): void
