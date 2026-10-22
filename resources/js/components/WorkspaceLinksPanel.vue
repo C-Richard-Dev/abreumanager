@@ -323,7 +323,7 @@ async function confirmDeleteLink() {
 </script>
 
 <template>
-    <section class="flex h-full min-h-[520px] flex-col rounded-xl border border-border bg-background p-3 shadow-sm">
+    <section class="flex h-full min-h-[480px] flex-col rounded-xl border border-border bg-background p-3 shadow-sm">
         <div class="mb-3 flex items-center justify-between border-b border-border pb-3">
             <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground">
                 Visualização
