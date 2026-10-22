@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Link as LinkIcon, Pencil, Plus, Trash2, Copy, ExternalLink } from '@lucide/vue';
+import { Link as LinkIcon, Pencil, Plus, Trash2, Copy, ExternalLink, Search } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
 
 
@@ -345,12 +345,13 @@ async function confirmDeleteLink() {
         </div>
 
         <div class="mb-4">
-            <div class="flex w-full items-center gap-2 rounded-md border border-border bg-background px-3 py-2.5">
+            <div class="flex w-full items-center gap-2 rounded-md border border-border bg-background px-3 py-2.5 transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
+                <Search class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                 <input
                     :value="searchQuery ?? ''"
                     type="search"
                     placeholder="Pesquisar por nome ou link"
-                    class="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    class="min-w-0 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                     @input="emit('search-change', ($event.target as HTMLInputElement).value)"
                 />
             </div>
