@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\EnsureWorkspaceAccess;
 use App\Http\Middleware\HaveWorkspace;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
@@ -23,19 +24,21 @@ Route::middleware(['auth'])->group(function () {
             ->middleware(HaveWorkspace::class);
         Route::get('/create', FormCreateWorkspaceController::class)
             ->name('workspaces.create');
-        Route::get('/{workspaceUuid}', ShowWorkspaceController::class)
-            ->name('workspaces.show');
         Route::post('/store', StoreWorkspaceController::class)
             ->name('workspaces.store');
-        Route::get('/{workspaceUuid}/edit', FormEditWorkspaceController::class)
-            ->name('workspaces.edit');
-        Route::put('/{workspaceUuid}', UpdateWorkspaceController::class)
-            ->name('workspaces.update');
-        Route::delete('/destroy/{workspaceUuid}', DeleteWorkspaceController::class)
-            ->name('workspaces.destroy');
+        Route::middleware(EnsureWorkspaceAccess::class)->group(function () {
+            Route::get('/{workspaceUuid}', ShowWorkspaceController::class)
+                ->name('workspaces.show');
+            Route::get('/{workspaceUuid}/edit', FormEditWorkspaceController::class)
+                ->name('workspaces.edit');
+            Route::put('/{workspaceUuid}', UpdateWorkspaceController::class)
+                ->name('workspaces.update');
+            Route::delete('/destroy/{workspaceUuid}', DeleteWorkspaceController::class)
+                ->name('workspaces.destroy');
+        });
     });
 
-    Route::prefix('categories')->group(function () {
+    Route::prefix('categories')->middleware(EnsureWorkspaceAccess::class)->group(function () {
         Route::post('{workspaceUuid}/store', App\Http\Controllers\Categories\StoreCategoryController::class)
             ->name('categories.store');
         Route::put('{categoryUuid}/update', App\Http\Controllers\Categories\UpdateCategoryController::class)
@@ -44,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('categories.destroy');
     });
 
-    Route::prefix('links')->group(function () {
+    Route::prefix('links')->middleware(EnsureWorkspaceAccess::class)->group(function () {
         Route::post('{workspaceUuid}/store', App\Http\Controllers\Links\StoreLinkController::class)
             ->name('links.store');
         Route::put('{linkUuid}/update', App\Http\Controllers\Links\UpdateLinkController::class)
