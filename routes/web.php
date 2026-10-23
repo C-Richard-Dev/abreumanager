@@ -6,6 +6,7 @@ use App\Http\Controllers\Categories\UpdateCategoryController;
 use App\Http\Controllers\Links\DestroyLinkController;
 use App\Http\Controllers\Links\StoreLinkController;
 use App\Http\Controllers\Links\UpdateLinkController;
+use App\Http\Controllers\ResetPassword\SendPasswordResetEmailController;
 use App\Http\Controllers\ResetPassword\ShowResetPasswordFormController;
 use App\Http\Controllers\Users\ResetPasswordOfUserController;
 use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
@@ -67,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('{token}/reset-password/form', ShowResetPasswordFormController::class)
     ->name('password.reset.form');
+Route::post('forgot-password/send', SendPasswordResetEmailController::class)
+    ->name('password.send-reset-link');
 Route::post('reset-password', ResetPasswordOfUserController::class)
     ->name('password.update');
 

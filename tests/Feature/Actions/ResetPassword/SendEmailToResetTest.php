@@ -2,11 +2,10 @@
 
 use App\Actions\ResetPassword\SendEmailToReset;
 use App\Models\User;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 test('password reset email is blocked for the same recipient for one minute', function () {
     $user = User::factory()->create();
-    Mail::fake();
     $action = app(SendEmailToReset::class);
 
     $action->execute($user->email);
@@ -14,7 +13,7 @@ test('password reset email is blocked for the same recipient for one minute', fu
     $this->travel(59)->seconds();
 
     expect(fn () => $action->execute($user->email))
-        ->toThrow(RuntimeException::class, 'Aguarde 1 minuto');
+        ->toThrow(ValidationException::class);
 
     $this->travel(1)->second();
 
@@ -24,7 +23,6 @@ test('password reset email is blocked for the same recipient for one minute', fu
 test('password reset email cooldown is scoped to the recipient', function () {
     $firstUser = User::factory()->create();
     $secondUser = User::factory()->create();
-    Mail::fake();
     $action = app(SendEmailToReset::class);
 
     $action->execute($firstUser->email);

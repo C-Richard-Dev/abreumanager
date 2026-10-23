@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class SendEmailToReset
 {
@@ -17,13 +18,17 @@ class SendEmailToReset
         $userEmailExists = User::where('email', $recipient)->exists();
 
         if (! $userEmailExists) {
-            throw new \Exception('E-mail não encontrado.');
+            throw ValidationException::withMessages([
+                'email' => 'E-mail não encontrado.',
+            ]);
         }
 
         $cacheKey = 'password-reset-email:'.hash('sha256', Str::lower(trim($recipient)));
 
         if (! Cache::add($cacheKey, true, 60)) {
-            throw new \RuntimeException('Aguarde 1 minuto antes de solicitar outro e-mail de redefinição de senha.');
+            throw ValidationException::withMessages([
+                'email' => 'Aguarde 1 minuto antes de solicitar outro e-mail de redefinição de senha.',
+            ]);
         }
 
         try {
