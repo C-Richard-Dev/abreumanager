@@ -58,5 +58,5 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('{token}/reset-password', App\Http\Controllers\ResetPassword\ShowResetPasswordFormController::class)
-    ->name('password.reset');
+    ->name('password.reset.form');
 require __DIR__.'/settings.php';
