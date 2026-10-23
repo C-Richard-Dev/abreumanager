@@ -7,11 +7,17 @@ use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class SendEmailToReset
 {
     public function execute(string $recipient): ?SentMessage
     {
+        $userEmailExists = User::where('email', $recipient)->exists();
+
+        if (!$userEmailExists) {
+            throw new \Exception('E-mail não encontrado.');
+        }
 
         $token = Str::random(60);
 
