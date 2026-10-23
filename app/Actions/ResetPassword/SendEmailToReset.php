@@ -2,12 +2,13 @@
 
 namespace App\Actions\ResetPassword;
 
+use App\Models\User;
 use Illuminate\Mail\Message;
 use Illuminate\Mail\SentMessage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Models\User;
 
 class SendEmailToReset
 {
@@ -15,27 +16,49 @@ class SendEmailToReset
     {
         $userEmailExists = User::where('email', $recipient)->exists();
 
-        if (!$userEmailExists) {
+        if (! $userEmailExists) {
             throw new \Exception('E-mail não encontrado.');
         }
 
-        $token = Str::random(60);
+        $cacheKey = 'password-reset-email:'.hash('sha256', Str::lower(trim($recipient)));
 
-        DB::table('password_reset_tokens')
-            ->updateOrInsert(
-                ['email' => $recipient],
-                ['token' => $token, 'created_at' => now()]
+        if (! Cache::add($cacheKey, true, 60)) {
+            throw new \RuntimeException('Aguarde 1 minuto antes de solicitar outro e-mail de redefinição de senha.');
+        }
+
+        try {
+            $token = Str::random(60);
+
+            DB::table('password_reset_tokens')
+                ->updateOrInsert(
+                    ['email' => $recipient],
+                    ['token' => $token, 'created_at' => now()]
+                );
+
+            $linkToReset = route('password.reset.form', ['token' => $token]);
+
+            $sentMessage = Mail::raw(
+                'Este é um e-mail solicitado para redefinição de senha. Clique no link a seguir para redefinir sua senha: '.$linkToReset,
+                function (Message $message) use ($recipient): void {
+                    $message
+                        ->to($recipient)
+                        ->subject('Redefinição de senha');
+                },
             );
+        } catch (\Throwable $exception) {
+            Cache::forget($cacheKey);
 
-        $linkToReset = route('password.reset.form', ['token' => $token]);
+            throw $exception;
+        }
 
-        return Mail::raw(
-            'Este é um e-mail solicitado para redefinição de senha. Clique no link a seguir para redefinir sua senha: '.$linkToReset,
-            function (Message $message) use ($recipient): void {
-                $message
-                    ->to($recipient)
-                    ->subject('Redefinição de senha');
-            },
-        );
+        if ($sentMessage === null) {
+            Cache::forget($cacheKey);
+
+            return null;
+        }
+
+        Cache::put($cacheKey, true, 60);
+
+        return $sentMessage;
     }
 }
