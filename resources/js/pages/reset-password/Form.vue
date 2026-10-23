@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import { Form, Head } from '@inertiajs/vue3';
 import { LockKeyhole } from '@lucide/vue';
-import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { update } from '@/routes/password';
 
 defineOptions({
     layout: {
@@ -17,26 +17,7 @@ defineOptions({
 
 const props = defineProps<{
     token: string;
-    email?: string;
 }>();
-
-const email = ref(props.email ?? '');
-const password = ref('');
-const passwordConfirmation = ref('');
-const passwordError = ref('');
-const formNotice = ref('');
-
-function handleSubmit(): void {
-    passwordError.value = '';
-    formNotice.value = '';
-
-    if (password.value !== passwordConfirmation.value) {
-        passwordError.value = 'As senhas não coincidem.';
-        return;
-    }
-
-    formNotice.value = 'O envio ainda não está conectado ao servidor.';
-}
 </script>
 
 <template>
@@ -47,33 +28,26 @@ function handleSubmit(): void {
             <LockKeyhole class="size-5" aria-hidden="true" />
         </div>
 
-        <form class="space-y-5" @submit.prevent="handleSubmit">
-            <input type="hidden" name="token" :value="props.token" />
-
-            <div class="grid gap-2">
-                <Label for="email">E-mail</Label>
-                <Input
-                    id="email"
-                    v-model="email"
-                    type="email"
-                    name="email"
-                    autocomplete="email"
-                    placeholder="voce@exemplo.com"
-                    required
-                />
-            </div>
+        <Form
+            v-bind="update.form()"
+            :transform="(data) => ({ ...data, token: props.token })"
+            :reset-on-success="['password', 'password_confirmation']"
+            v-slot="{ errors, processing }"
+            class="space-y-5"
+        >
+            <InputError :message="errors.token" />
 
             <div class="grid gap-2">
                 <Label for="password">Nova senha</Label>
                 <PasswordInput
                     id="password"
-                    v-model="password"
                     name="password"
                     autocomplete="new-password"
                     placeholder="Digite sua nova senha"
                     minlength="8"
                     required
                 />
+                <InputError :message="errors.password" />
                 <p class="text-xs text-muted-foreground">
                     Use pelo menos 8 caracteres.
                 </p>
@@ -83,27 +57,19 @@ function handleSubmit(): void {
                 <Label for="password_confirmation">Confirmar nova senha</Label>
                 <PasswordInput
                     id="password_confirmation"
-                    v-model="passwordConfirmation"
                     name="password_confirmation"
                     autocomplete="new-password"
                     placeholder="Digite a senha novamente"
                     minlength="8"
                     required
                 />
-                <InputError :message="passwordError" />
+                <InputError :message="errors.password_confirmation" />
             </div>
 
-            <Button type="submit" class="w-full">
+            <Button type="submit" class="w-full" :disabled="processing">
+                <Spinner v-if="processing" />
                 Redefinir senha
             </Button>
-
-            <p
-                v-if="formNotice"
-                role="status"
-                class="text-center text-sm text-muted-foreground"
-            >
-                {{ formNotice }}
-            </p>
-        </form>
+        </Form>
     </div>
 </template>
