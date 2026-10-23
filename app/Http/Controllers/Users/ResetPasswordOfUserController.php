@@ -17,18 +17,7 @@ class ResetPasswordOfUserController
         string $token
     ): RedirectResponse
     {
-        $validToken = DB::table('password_resets')
-            ->where('email', $request->email)
-            ->where('token', $token)
-            ->first();
-        
-        if(!$validToken) {
-            return redirect()
-                ->back()
-                ->withErrors(['token' => 'Token inválido ou expirado.']);
-        }
-
-        $resetPassword->execute($request->email, $request->password);
+        $resetPassword->execute($request->email, $request->password, $request->token);
 
         return redirect()
             ->route('login')
