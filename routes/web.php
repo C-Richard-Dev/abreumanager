@@ -1,15 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\EnsureWorkspaceAccess;
-use App\Http\Middleware\HaveWorkspace;
+use App\Http\Controllers\Categories\DeleteCategoryController;
+use App\Http\Controllers\Categories\StoreCategoryController;
+use App\Http\Controllers\Categories\UpdateCategoryController;
+use App\Http\Controllers\Links\DestroyLinkController;
+use App\Http\Controllers\Links\StoreLinkController;
+use App\Http\Controllers\Links\UpdateLinkController;
+use App\Http\Controllers\ResetPassword\ShowResetPasswordFormController;
+use App\Http\Controllers\Users\ResetPasswordOfUserController;
+use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
-use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\ShowWorkspaceController;
+use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\UpdateWorkspaceController;
-use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
+use App\Http\Middleware\EnsureWorkspaceAccess;
+use App\Http\Middleware\HaveWorkspace;
+use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -39,27 +47,27 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('categories')->middleware(EnsureWorkspaceAccess::class)->group(function () {
-        Route::post('{workspaceUuid}/store', App\Http\Controllers\Categories\StoreCategoryController::class)
+        Route::post('{workspaceUuid}/store', StoreCategoryController::class)
             ->name('categories.store');
-        Route::put('{categoryUuid}/update', App\Http\Controllers\Categories\UpdateCategoryController::class)
+        Route::put('{categoryUuid}/update', UpdateCategoryController::class)
             ->name('categories.update');
-        Route::delete('{categoryUuid}/destroy', App\Http\Controllers\Categories\DeleteCategoryController::class)
+        Route::delete('{categoryUuid}/destroy', DeleteCategoryController::class)
             ->name('categories.destroy');
     });
 
     Route::prefix('links')->middleware(EnsureWorkspaceAccess::class)->group(function () {
-        Route::post('{workspaceUuid}/store', App\Http\Controllers\Links\StoreLinkController::class)
+        Route::post('{workspaceUuid}/store', StoreLinkController::class)
             ->name('links.store');
-        Route::put('{linkUuid}/update', App\Http\Controllers\Links\UpdateLinkController::class)
+        Route::put('{linkUuid}/update', UpdateLinkController::class)
             ->name('links.update');
-        Route::delete('{linkUuid}/destroy', App\Http\Controllers\Links\DestroyLinkController::class)
+        Route::delete('{linkUuid}/destroy', DestroyLinkController::class)
             ->name('links.destroy');
     });
 });
 
-Route::get('{token}/reset-password/form', App\Http\Controllers\ResetPassword\ShowResetPasswordFormController::class)
+Route::get('{token}/reset-password/form', ShowResetPasswordFormController::class)
     ->name('password.reset.form');
-Route::post('reset-password', App\Http\Controllers\Users\ResetPasswordOfUserController::class)
-    ->name('password.reset');
+Route::post('reset-password', ResetPasswordOfUserController::class)
+    ->name('password.update');
 
 require __DIR__.'/settings.php';
