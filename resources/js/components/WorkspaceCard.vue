@@ -16,6 +16,11 @@ interface Workspace {
     id: number;
     uuid: string;
     name: string;
+    created_by: number;
+    creator: {
+        id: number;
+        name: string;
+    };
     created_at: string;
     updated_at: string;
 }
@@ -49,8 +54,11 @@ function handleDelete() {
             {{ workspace.name }}
         </h2>
 
-        <p class="text-sm text-muted-foreground">
+        <p class="text-sm text-muted-foreground mb-0">
             Criado em: {{ formatDate(workspace.created_at) }}
+        </p>
+        <p class="text-sm text-muted-foreground -mb-1">
+            Por {{ workspace.creator.name }}
         </p>
 
         <div class="mt-4 flex flex-wrap gap-2">

@@ -22,6 +22,7 @@ class CreateWorkspace
 
         $workspace = Workspace::create([
             'name' => $name,
+            'created_by' => auth()->id(),
         ]);
 
         UserWorkspace::create([

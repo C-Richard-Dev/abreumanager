@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Workspaces;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Inertia\Response;
 
 class ListWorkspaceController extends Controller
 {
-    public function __invoke(): \Inertia\Response
+    public function __invoke(): Response
     {
         return inertia('Workspace/Index', [
-            'workspaces' => auth()->user()->workspaces()->orderBy('created_at')->get()
+            'workspaces' => auth()->user()
+                ->workspaces()
+                ->with('creator:id,name')
+                ->orderBy('created_at')
+                ->get(),
         ]);
     }
 }

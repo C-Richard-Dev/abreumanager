@@ -5,6 +5,22 @@ use App\Models\Link;
 use App\Models\User;
 use App\Models\Workspace;
 
+it('includes workspace creators in the workspace listing', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::create([
+        'name' => 'Personal',
+        'created_by' => $user->id,
+    ]);
+    $user->workspaces()->attach($workspace);
+
+    $this->actingAs($user)
+        ->get(route('workspaces.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Workspace/Index')
+            ->where('workspaces.0.creator.name', $user->name));
+});
+
 it('allows a workspace member to view the workspace', function () {
     $user = User::factory()->create();
     $workspace = Workspace::create(['name' => 'Personal']);
