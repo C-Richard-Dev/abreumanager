@@ -11,6 +11,7 @@ class ListUsersOfWorkspace extends Controller
     public function __invoke(Request $request, string $workspaceUuid)
     {
         $workspace = Workspace::where('uuid', $workspaceUuid)->firstOrFail();
-        return response()->json($workspace->users);
+
+        return response()->json($workspace->users->makeHidden('id'));
     }
 }

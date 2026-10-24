@@ -1,9 +1,27 @@
 <?php
 
+use App\Http\Controllers\Workspaces\ListUsersOfWorkspace;
 use App\Models\Category;
 use App\Models\Link;
 use App\Models\User;
 use App\Models\Workspace;
+use Illuminate\Http\Request;
+
+it('does not include user ids in the workspace users JSON response', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Personal']);
+    $workspace->users()->attach($user);
+
+    $response = (new ListUsersOfWorkspace)(Request::create('/'), $workspace->uuid);
+
+    $userJson = $response->getData(true)[0];
+
+    expect($userJson)->not->toHaveKey('id');
+    expect($userJson)->toMatchArray([
+        'uuid' => $user->uuid,
+        'name' => $user->name,
+    ]);
+});
 
 it('includes workspace creators in the workspace listing', function () {
     $user = User::factory()->create();
