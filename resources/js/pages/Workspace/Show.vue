@@ -5,6 +5,7 @@ import { ArrowLeft } from '@lucide/vue';
 import { index } from '@/routes/workspaces';
 import WorkspaceCategorySelector from '@/components/WorkspaceCategorySelector.vue';
 import WorkspaceLinksPanel from '@/components/WorkspaceLinksPanel.vue';
+import WorkspaceMembersSheet from '@/components/WorkspaceMembersSheet.vue';
 
 interface Workspace {
     id?: number;
@@ -162,6 +163,8 @@ function handleCategorySelected(categoryId: number) {
                 <ArrowLeft class="size-4" />
                 Voltar
             </Link>
+
+            <WorkspaceMembersSheet :workspace-uuid="workspace.uuid" />
         </div>
 
         <div class="mb-5">
