@@ -9,11 +9,12 @@ use App\Http\Controllers\Links\UpdateLinkController;
 use App\Http\Controllers\ResetPassword\SendPasswordResetEmailController;
 use App\Http\Controllers\ResetPassword\ShowResetPasswordFormController;
 use App\Http\Controllers\Users\ResetPasswordOfUserController;
-use App\Http\Controllers\Workspaces\ListUsersOfWorkspace;
 use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
+use App\Http\Controllers\Workspaces\ListUsersOfWorkspace;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
+use App\Http\Controllers\Workspaces\SendInviteEmailController;
 use App\Http\Controllers\Workspaces\ShowWorkspaceController;
 use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\UpdateWorkspaceController;
@@ -41,6 +42,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('workspaces.show');
             Route::get('/{workspaceUuid}/edit', FormEditWorkspaceController::class)
                 ->name('workspaces.edit');
+            Route::post('/{workspaceUuid}/invite', SendInviteEmailController::class)
+                ->name('workspaces.invite');
             Route::put('/{workspaceUuid}', UpdateWorkspaceController::class)
                 ->name('workspaces.update');
             Route::delete('/destroy/{workspaceUuid}', DeleteWorkspaceController::class)
