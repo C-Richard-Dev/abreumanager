@@ -18,7 +18,15 @@ class SendInviteEmail
     {
         $recipient = Str::lower(trim($recipient));
 
-        $isAlreadyMember = $workspace->users()->where('email', $recipient)->exists();
+        $user = User::where('email', $recipient)->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'email' => 'Não existe um usuário com este e-mail.',
+            ]);
+        }
+
+        $isAlreadyMember = $workspace->users()->where('email', $user->email)->first();
 
         if ($isAlreadyMember) {
             throw ValidationException::withMessages([
