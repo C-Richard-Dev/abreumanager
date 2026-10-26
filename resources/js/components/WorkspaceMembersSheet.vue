@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Users } from '@lucide/vue';
-import { users as workspaceUsers } from '@/routes/workspaces';
+import { Form } from '@inertiajs/vue3';
+import { Mail, UserPlus, Users } from '@lucide/vue';
+import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { invite, users as workspaceUsers } from '@/routes/workspaces';
 import {
     Sheet,
     SheetContent,
@@ -24,9 +29,12 @@ const props = defineProps<{
 const members = ref<Member[]>([]);
 const loading = ref(false);
 const failed = ref(false);
+const isInviting = ref(false);
 
 async function loadMembers(open: boolean) {
     if (!open) {
+        isInviting.value = false;
+
         return;
     }
 
@@ -60,7 +68,7 @@ async function loadMembers(open: boolean) {
                 class="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-sm font-medium leading-normal text-foreground transition hover:bg-muted"
             >
                 <Users class="size-4" />
-                Membros ({{ members.length }})
+                Ver Membros
             </button>
         </SheetTrigger>
 
@@ -72,7 +80,64 @@ async function loadMembers(open: boolean) {
                 </SheetDescription>
             </SheetHeader>
 
-            <div class="flex flex-col gap-2 px-4 pb-4">
+            <div class="px-4">
+                <Button
+                    v-if="!isInviting"
+                    type="button"
+                    class="w-full gap-2"
+                    @click="isInviting = true"
+                >
+                    <UserPlus class="size-4" />
+                    Convidar Membro
+                </Button>
+
+                <Form
+                    v-else
+                    v-bind="invite.form(workspaceUuid)"
+                    reset-on-success
+                    :options="{ preserveScroll: true }"
+                    class="grid gap-3 rounded-md border border-border p-3"
+                    v-slot="{ errors, processing, clearErrors }"
+                    @success="isInviting = false"
+                >
+                    <div class="grid gap-2">
+                        <Label for="invite-email">E-mail do convidado</Label>
+                        <div class="relative">
+                            <Mail class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                id="invite-email"
+                                name="email"
+                                type="email"
+                                autofocus
+                                required
+                                placeholder="usuario@exemplo.com"
+                                class="pl-9"
+                            />
+                        </div>
+                        <InputError :message="errors.email" />
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            @click="
+                                () => {
+                                    clearErrors();
+                                    isInviting = false;
+                                }
+                            "
+                        >
+                            Cancelar
+                        </Button>
+                        <Button type="submit" :disabled="processing">
+                            {{ processing ? 'Enviando...' : 'Enviar convite' }}
+                        </Button>
+                    </div>
+                </Form>
+            </div>
+
+            <div class="flex flex-col gap-2 px-4 pb-4 pt-4">
                 <template v-if="loading">
                     <div v-for="i in 3" :key="i" class="h-14 animate-pulse rounded-md bg-muted" />
                 </template>
