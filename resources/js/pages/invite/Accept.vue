@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { Form, Head, Link } from '@inertiajs/vue3';
+import { Form, Head } from '@inertiajs/vue3';
 import { UserPlus } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { index } from '@/routes/workspaces';
-import { accept } from '@/routes/invite';
+import { accept, decline } from '@/routes/invite';
 
 defineOptions({
     layout: {
@@ -47,8 +46,14 @@ defineProps<{
                 Aceitar convite
             </Button>
 
-            <Button as-child variant="secondary" class="w-full">
-                <Link :href="index.url()">Agora não</Link>
+        </Form>
+
+        <Form
+            v-bind="decline.form(token)"
+            v-slot="{ processing }"
+        >
+            <Button type="submit" variant="secondary" class="w-full" :disabled="processing">
+                Recusar convite
             </Button>
         </Form>
     </div>

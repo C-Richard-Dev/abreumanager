@@ -98,3 +98,31 @@ it('renders the invite success page with a login link', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('invite/Success'));
 });
+
+it('deletes the invite without adding the user when declined', function () {
+    $sender = User::factory()->create();
+    $guest = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $sender->id]);
+    $token = createInvite($sender, $workspace, $guest->email);
+
+    $this->actingAs($guest)
+        ->delete(route('invite.decline', ['token' => $token]))
+        ->assertRedirect(route('workspaces.index'));
+
+    expect($workspace->users()->whereKey($guest->id)->exists())->toBeFalse();
+    $this->assertDatabaseCount('invite_tokens', 0);
+});
+
+it('does not delete an invite that belongs to another email when declined', function () {
+    $sender = User::factory()->create();
+    $guest = User::factory()->create();
+    $other = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $sender->id]);
+    $token = createInvite($sender, $workspace, $guest->email);
+
+    $this->actingAs($other)
+        ->delete(route('invite.decline', ['token' => $token]))
+        ->assertSessionHasErrors(['token' => 'O convite é inválido ou expirou.']);
+
+    $this->assertDatabaseCount('invite_tokens', 1);
+});

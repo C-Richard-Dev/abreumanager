@@ -10,6 +10,7 @@ use App\Http\Controllers\ResetPassword\SendPasswordResetEmailController;
 use App\Http\Controllers\ResetPassword\ShowResetPasswordFormController;
 use App\Http\Controllers\Users\ResetPasswordOfUserController;
 use App\Http\Controllers\Workspaces\AcceptInviteController;
+use App\Http\Controllers\Workspaces\DeclineInviteController;
 use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
@@ -64,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('invite.show');
         Route::post('{token}/accept', AcceptInviteController::class)
             ->name('invite.accept');
+        Route::delete('{token}/decline', DeclineInviteController::class)
+            ->name('invite.decline');
     });
 
     Route::prefix('categories')->middleware(EnsureWorkspaceAccess::class)->group(function () {
