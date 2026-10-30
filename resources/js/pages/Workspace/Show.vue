@@ -9,6 +9,7 @@ import WorkspaceMembersSheet from '@/components/WorkspaceMembersSheet.vue';
 
 interface Workspace {
     id?: number;
+    created_by?: number;
     uuid: string;
     name: string;
 }
@@ -46,6 +47,7 @@ interface LinksPage {
 }
 
 const page = usePage<{
+    auth: { user: { id: number; uuid: string } };
     workspace: Workspace;
     categories: Category[];
     links: LinksPage | LinkItem[];
@@ -54,6 +56,7 @@ const page = usePage<{
 }>();
 
 const workspace = computed(() => page.props.workspace);
+const isWorkspaceCreator = computed(() => page.props.auth.user.id === workspace.value.created_by);
 const categories = computed(() => page.props.categories ?? []);
 const searchTerm = ref(page.props.searchQuery ?? '');
 const linksPage = computed<LinksPage>(() => {
@@ -164,7 +167,11 @@ function handleCategorySelected(categoryId: number) {
                 Voltar
             </Link>
 
-            <WorkspaceMembersSheet :workspace-uuid="workspace.uuid" />
+            <WorkspaceMembersSheet
+                :workspace-uuid="workspace.uuid"
+                :can-remove-members="isWorkspaceCreator"
+                :current-user-uuid="page.props.auth.user.uuid"
+            />
         </div>
 
         <div class="mb-5">

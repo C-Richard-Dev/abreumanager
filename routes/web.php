@@ -16,6 +16,7 @@ use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
 use App\Http\Controllers\Workspaces\ListUsersOfWorkspace;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
+use App\Http\Controllers\Workspaces\RemoveMemberController;
 use App\Http\Controllers\Workspaces\SendInviteEmailController;
 use App\Http\Controllers\Workspaces\ShowInviteController;
 use App\Http\Controllers\Workspaces\ShowInviteSuccessController;
@@ -57,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('workspaces.destroy');
             Route::get('/{workspaceUuid}/users', ListUsersOfWorkspace::class)
                 ->name('workspaces.users');
+            Route::delete('/{workspaceUuid}/users/{userUuid}', RemoveMemberController::class)
+                ->name('workspaces.users.destroy');
         });
     });
 

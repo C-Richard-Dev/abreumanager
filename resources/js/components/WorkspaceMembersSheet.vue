@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Form } from '@inertiajs/vue3';
-import { Mail, UserPlus, Users } from '@lucide/vue';
+import { Form, router } from '@inertiajs/vue3';
+import { Mail, Trash2, UserPlus, Users } from '@lucide/vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { invite, users as workspaceUsers } from '@/routes/workspaces';
+import { destroy as removeMemberRoute } from '@/routes/workspaces/users';
 import {
     Sheet,
     SheetContent,
@@ -24,12 +26,48 @@ interface Member {
 
 const props = defineProps<{
     workspaceUuid: string;
+    canRemoveMembers?: boolean;
+    currentUserUuid?: string;
 }>();
 
 const members = ref<Member[]>([]);
 const loading = ref(false);
 const failed = ref(false);
 const isInviting = ref(false);
+const memberToRemove = ref<Member | null>(null);
+const isRemoveModalOpen = ref(false);
+const removalError = ref<string | null>(null);
+
+function askToRemove(member: Member) {
+    memberToRemove.value = member;
+    removalError.value = null;
+    isRemoveModalOpen.value = true;
+}
+
+function removeMember() {
+    if (!memberToRemove.value) {
+        return;
+    }
+
+    router.delete(
+        removeMemberRoute.url({
+            workspaceUuid: props.workspaceUuid,
+            userUuid: memberToRemove.value.uuid,
+        }),
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => loadMembers(true),
+            onError: (errors) => {
+                removalError.value = errors.member ?? 'Não foi possível remover o membro.';
+            },
+            onFinish: () => {
+                isRemoveModalOpen.value = false;
+                memberToRemove.value = null;
+            },
+        },
+    );
+}
 
 async function loadMembers(open: boolean) {
     if (!open) {
@@ -61,6 +99,7 @@ async function loadMembers(open: boolean) {
 </script>
 
 <template>
+    <div>
     <Sheet @update:open="loadMembers">
         <SheetTrigger as-child>
             <button
@@ -154,13 +193,39 @@ async function loadMembers(open: boolean) {
                     <li
                         v-for="member in members"
                         :key="member.uuid"
-                        class="rounded-md border border-border px-3 py-2"
+                        class="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
                     >
-                        <p class="text-sm font-medium text-foreground">{{ member.name }}</p>
-                        <p class="text-xs text-muted-foreground">{{ member.email }}</p>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-medium text-foreground">{{ member.name }}</p>
+                            <p class="truncate text-xs text-muted-foreground">{{ member.email }}</p>
+                        </div>
+
+                        <Button
+                            v-if="canRemoveMembers && member.uuid !== currentUserUuid"
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            class="shrink-0 text-destructive"
+                            :aria-label="`Remover ${member.name}`"
+                            @click="askToRemove(member)"
+                        >
+                            <Trash2 class="size-4" />
+                        </Button>
                     </li>
                 </ul>
+
+                <p v-if="removalError" class="text-sm text-destructive">{{ removalError }}</p>
             </div>
         </SheetContent>
     </Sheet>
+
+    <ConfirmDialog
+        v-model:is-open="isRemoveModalOpen"
+        title="Remover membro"
+        :message="`Tem certeza que deseja remover '${memberToRemove?.name ?? ''}' do workspace?`"
+        confirm-text="Remover"
+        cancel-text="Cancelar"
+        @confirm="removeMember"
+    />
+    </div>
 </template>

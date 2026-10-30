@@ -88,3 +88,56 @@ it('prevents non-members from deleting a workspace link', function () {
 
     $this->assertModelExists($link);
 });
+
+it('lets the workspace creator remove a member', function () {
+    $creator = User::factory()->create();
+    $member = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $creator->id]);
+    $workspace->users()->attach([$creator->id, $member->id]);
+
+    $this->actingAs($creator)
+        ->delete(route('workspaces.users.destroy', ['workspaceUuid' => $workspace->uuid, 'userUuid' => $member->uuid]))
+        ->assertRedirect();
+
+    expect($workspace->users()->whereKey($member->id)->exists())->toBeFalse();
+    expect($workspace->users()->whereKey($creator->id)->exists())->toBeTrue();
+});
+
+it('forbids a non-creator member from removing a member', function () {
+    $creator = User::factory()->create();
+    $member = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $creator->id]);
+    $workspace->users()->attach([$creator->id, $member->id]);
+
+    $this->actingAs($member)
+        ->delete(route('workspaces.users.destroy', ['workspaceUuid' => $workspace->uuid, 'userUuid' => $creator->uuid]))
+        ->assertForbidden();
+
+    expect($workspace->users()->whereKey($creator->id)->exists())->toBeTrue();
+});
+
+it('does not allow removing the workspace creator', function () {
+    $creator = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $creator->id]);
+    $workspace->users()->attach($creator);
+
+    $this->actingAs($creator)
+        ->delete(route('workspaces.users.destroy', ['workspaceUuid' => $workspace->uuid, 'userUuid' => $creator->uuid]))
+        ->assertSessionHasErrors(['member' => 'O criador do workspace não pode ser removido.']);
+
+    expect($workspace->users()->whereKey($creator->id)->exists())->toBeTrue();
+});
+
+it('returns 404 when a non-member tries to remove a member', function () {
+    $creator = User::factory()->create();
+    $member = User::factory()->create();
+    $outsider = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $creator->id]);
+    $workspace->users()->attach([$creator->id, $member->id]);
+
+    $this->actingAs($outsider)
+        ->delete(route('workspaces.users.destroy', ['workspaceUuid' => $workspace->uuid, 'userUuid' => $member->uuid]))
+        ->assertNotFound();
+
+    expect($workspace->users()->whereKey($member->id)->exists())->toBeTrue();
+});
