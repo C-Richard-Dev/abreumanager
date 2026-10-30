@@ -1,5 +1,7 @@
 export type User = {
     id: number;
+    uuid: string;
+    type: 'admin' | 'regular';
     name: string;
     email: string;
     avatar?: string;

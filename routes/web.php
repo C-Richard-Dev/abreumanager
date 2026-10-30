@@ -8,7 +8,13 @@ use App\Http\Controllers\Links\StoreLinkController;
 use App\Http\Controllers\Links\UpdateLinkController;
 use App\Http\Controllers\ResetPassword\SendPasswordResetEmailController;
 use App\Http\Controllers\ResetPassword\ShowResetPasswordFormController;
+use App\Http\Controllers\Users\DeleteUserController;
+use App\Http\Controllers\Users\FormCreateUserController;
+use App\Http\Controllers\Users\FormEditUserController;
+use App\Http\Controllers\Users\ListUsersController;
 use App\Http\Controllers\Users\ResetPasswordOfUserController;
+use App\Http\Controllers\Users\StoreUserController;
+use App\Http\Controllers\Users\UpdateUserController;
 use App\Http\Controllers\Workspaces\AcceptInviteController;
 use App\Http\Controllers\Workspaces\DeclineInviteController;
 use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
@@ -24,6 +30,7 @@ use App\Http\Controllers\Workspaces\ShowInviteSuccessController;
 use App\Http\Controllers\Workspaces\ShowWorkspaceController;
 use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\UpdateWorkspaceController;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureWorkspaceAccess;
 use App\Http\Middleware\HaveWorkspace;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +80,21 @@ Route::middleware(['auth'])->group(function () {
             ->name('invite.accept');
         Route::delete('{token}/decline', DeclineInviteController::class)
             ->name('invite.decline');
+    });
+
+    Route::prefix('users')->middleware(EnsureUserIsAdmin::class)->group(function () {
+        Route::get('/', ListUsersController::class)
+            ->name('users.index');
+        Route::get('/create', FormCreateUserController::class)
+            ->name('users.create');
+        Route::post('/store', StoreUserController::class)
+            ->name('users.store');
+        Route::get('/{userUuid}/edit', FormEditUserController::class)
+            ->name('users.edit');
+        Route::put('/{userUuid}', UpdateUserController::class)
+            ->name('users.update');
+        Route::delete('/{userUuid}', DeleteUserController::class)
+            ->name('users.destroy');
     });
 
     Route::prefix('categories')->middleware(EnsureWorkspaceAccess::class)->group(function () {
