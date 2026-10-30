@@ -9,12 +9,15 @@ use App\Http\Controllers\Links\UpdateLinkController;
 use App\Http\Controllers\ResetPassword\SendPasswordResetEmailController;
 use App\Http\Controllers\ResetPassword\ShowResetPasswordFormController;
 use App\Http\Controllers\Users\ResetPasswordOfUserController;
+use App\Http\Controllers\Workspaces\AcceptInviteController;
 use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
 use App\Http\Controllers\Workspaces\ListUsersOfWorkspace;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
 use App\Http\Controllers\Workspaces\SendInviteEmailController;
+use App\Http\Controllers\Workspaces\ShowInviteController;
+use App\Http\Controllers\Workspaces\ShowInviteSuccessController;
 use App\Http\Controllers\Workspaces\ShowWorkspaceController;
 use App\Http\Controllers\Workspaces\StoreWorkspaceController;
 use App\Http\Controllers\Workspaces\UpdateWorkspaceController;
@@ -23,6 +26,9 @@ use App\Http\Middleware\HaveWorkspace;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
+
+Route::get('invite/success', ShowInviteSuccessController::class)
+    ->name('invite.success');
 
 Route::middleware(['auth'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')
@@ -51,6 +57,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{workspaceUuid}/users', ListUsersOfWorkspace::class)
                 ->name('workspaces.users');
         });
+    });
+
+    Route::prefix('invite')->group(function () {
+        Route::get('{token}', ShowInviteController::class)
+            ->name('invite.show');
+        Route::post('{token}/accept', AcceptInviteController::class)
+            ->name('invite.accept');
     });
 
     Route::prefix('categories')->middleware(EnsureWorkspaceAccess::class)->group(function () {

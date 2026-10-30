@@ -13,7 +13,7 @@ void createInertiaApp({
         switch (true) {
             case name === 'Welcome':
                 return null;
-            case name.startsWith('auth/') || name.startsWith('reset-password/'):
+            case name.startsWith('auth/') || name.startsWith('reset-password/') || name.startsWith('invite/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];

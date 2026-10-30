@@ -56,7 +56,7 @@ class SendInviteEmail
                 ]
             );
 
-            $linkToAccept = url('/invite/'.$token);
+            $linkToAccept = route('invite.show', ['token' => $token]);
 
             $sentMessage = Mail::raw(
                 "{$sender->name} convidou você para ser membro do workspace \"{$workspace->name}\". Clique no link a seguir para aceitar o convite: ".$linkToAccept,
