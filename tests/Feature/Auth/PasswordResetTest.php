@@ -2,7 +2,10 @@
 
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
@@ -42,26 +45,43 @@ test('reset password screen can be rendered', function () {
 });
 
 test('password can be reset with valid token', function () {
-    Notification::fake();
-
     $user = User::factory()->create();
+    $token = Str::random(60);
 
-    $this->post(route('password.email'), ['email' => $user->email]);
+    DB::table('password_reset_tokens')->insert([
+        'email' => $user->email,
+        'token' => $token,
+        'created_at' => now(),
+    ]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->post(route('password.update'), [
-            'token' => $notification->token,
-            'email' => $user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
+    $response = $this->post(route('password.update'), [
+        'token' => $token,
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ]);
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('login'));
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('login'));
 
-        return true;
-    });
+    expect(Hash::check('new-password', $user->fresh()->password))->toBeTrue();
+    $this->assertDatabaseMissing('password_reset_tokens', ['email' => $user->email]);
+});
+
+test('custom reset password form renders its token', function () {
+    $user = User::factory()->create();
+    $token = Str::random(60);
+
+    DB::table('password_reset_tokens')->insert([
+        'email' => $user->email,
+        'token' => $token,
+        'created_at' => now(),
+    ]);
+
+    $this->get(route('password.reset.form', ['token' => $token]))
+        ->assertInertia(fn ($page) => $page
+            ->component('reset-password/Form')
+            ->where('token', $token));
 });
 
 test('password cannot be reset with invalid token', function () {
@@ -69,10 +89,9 @@ test('password cannot be reset with invalid token', function () {
 
     $response = $this->post(route('password.update'), [
         'token' => 'invalid-token',
-        'email' => $user->email,
         'password' => 'newpassword123',
         'password_confirmation' => 'newpassword123',
     ]);
 
-    $response->assertSessionHasErrors('email');
+    $response->assertSessionHasErrors('token');
 });

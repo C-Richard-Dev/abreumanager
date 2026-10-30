@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * @property string $uuid
  * @property string $name
+ * @property int $created_by
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * 
  */
-#[Fillable(['uuid', 'name'])]
+#[Fillable(['uuid', 'name', 'created_by'])]
 class Workspace extends Model
 {
     protected static function booted(): void
@@ -40,5 +40,10 @@ class Workspace extends Model
     public function links(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Link::class);
+    }
+
+    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

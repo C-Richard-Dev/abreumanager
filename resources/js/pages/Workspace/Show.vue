@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { ArrowLeft } from '@lucide/vue';
-import { index } from '@/routes/workspaces';
+import { ArrowLeft, LogOut } from '@lucide/vue';
+import { index, leave } from '@/routes/workspaces';
 import WorkspaceCategorySelector from '@/components/WorkspaceCategorySelector.vue';
 import WorkspaceLinksPanel from '@/components/WorkspaceLinksPanel.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { Button } from '@/components/ui/button';
+import WorkspaceMembersSheet from '@/components/WorkspaceMembersSheet.vue';
 
 interface Workspace {
     id?: number;
+    created_by?: number;
     uuid: string;
     name: string;
 }
@@ -45,6 +49,7 @@ interface LinksPage {
 }
 
 const page = usePage<{
+    auth: { user: { id: number; uuid: string } };
     workspace: Workspace;
     categories: Category[];
     links: LinksPage | LinkItem[];
@@ -53,7 +58,17 @@ const page = usePage<{
 }>();
 
 const workspace = computed(() => page.props.workspace);
+const isWorkspaceCreator = computed(() => page.props.auth.user.id === workspace.value.created_by);
+const isLeaveModalOpen = ref(false);
 const categories = computed(() => page.props.categories ?? []);
+
+function leaveWorkspace() {
+    router.delete(leave.url(workspace.value.uuid), {
+        onFinish: () => {
+            isLeaveModalOpen.value = false;
+        },
+    });
+}
 const searchTerm = ref(page.props.searchQuery ?? '');
 const linksPage = computed<LinksPage>(() => {
     const rawLinks = page.props.links ?? { data: [] };
@@ -162,6 +177,25 @@ function handleCategorySelected(categoryId: number) {
                 <ArrowLeft class="size-4" />
                 Voltar
             </Link>
+
+            <div class="flex items-center gap-2">
+                <Button
+                    v-if="!isWorkspaceCreator"
+                    type="button"
+                    variant="outline"
+                    class="gap-2 text-destructive"
+                    @click="isLeaveModalOpen = true"
+                >
+                    <LogOut class="size-4" />
+                    Sair do workspace
+                </Button>
+
+                <WorkspaceMembersSheet
+                    :workspace-uuid="workspace.uuid"
+                    :can-remove-members="isWorkspaceCreator"
+                    :current-user-uuid="page.props.auth.user.uuid"
+                />
+            </div>
         </div>
 
         <div class="mb-5">
@@ -194,5 +228,14 @@ function handleCategorySelected(categoryId: number) {
                 @search-change="handleSearchChange"
             />
         </div>
+
+        <ConfirmDialog
+            v-model:is-open="isLeaveModalOpen"
+            title="Sair do workspace"
+            :message="`Tem certeza que deseja sair do workspace '${workspace.name}'? Você precisará de um novo convite para voltar.`"
+            confirm-text="Sair"
+            cancel-text="Cancelar"
+            @confirm="leaveWorkspace"
+        />
     </div>
 </template>
