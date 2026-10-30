@@ -14,6 +14,7 @@ use App\Http\Controllers\Workspaces\DeclineInviteController;
 use App\Http\Controllers\Workspaces\DeleteWorkspaceController;
 use App\Http\Controllers\Workspaces\FormCreateWorkspaceController;
 use App\Http\Controllers\Workspaces\FormEditWorkspaceController;
+use App\Http\Controllers\Workspaces\LeaveWorkspaceController;
 use App\Http\Controllers\Workspaces\ListUsersOfWorkspace;
 use App\Http\Controllers\Workspaces\ListWorkspaceController;
 use App\Http\Controllers\Workspaces\RemoveMemberController;
@@ -58,6 +59,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('workspaces.destroy');
             Route::get('/{workspaceUuid}/users', ListUsersOfWorkspace::class)
                 ->name('workspaces.users');
+            Route::delete('/{workspaceUuid}/leave', LeaveWorkspaceController::class)
+                ->name('workspaces.leave');
             Route::delete('/{workspaceUuid}/users/{userUuid}', RemoveMemberController::class)
                 ->name('workspaces.users.destroy');
         });

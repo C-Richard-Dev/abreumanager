@@ -141,3 +141,40 @@ it('returns 404 when a non-member tries to remove a member', function () {
 
     expect($workspace->users()->whereKey($member->id)->exists())->toBeTrue();
 });
+
+it('lets an invited member leave the workspace', function () {
+    $creator = User::factory()->create();
+    $member = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $creator->id]);
+    $workspace->users()->attach([$creator->id, $member->id]);
+
+    $this->actingAs($member)
+        ->delete(route('workspaces.leave', ['workspaceUuid' => $workspace->uuid]))
+        ->assertRedirect(route('workspaces.index'));
+
+    expect($workspace->users()->whereKey($member->id)->exists())->toBeFalse();
+    expect($workspace->users()->whereKey($creator->id)->exists())->toBeTrue();
+});
+
+it('does not allow the workspace creator to leave', function () {
+    $creator = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $creator->id]);
+    $workspace->users()->attach($creator);
+
+    $this->actingAs($creator)
+        ->delete(route('workspaces.leave', ['workspaceUuid' => $workspace->uuid]))
+        ->assertSessionHasErrors(['workspace' => 'O criador do workspace não pode sair dele.']);
+
+    expect($workspace->users()->whereKey($creator->id)->exists())->toBeTrue();
+});
+
+it('returns 404 when a non-member tries to leave a workspace', function () {
+    $creator = User::factory()->create();
+    $outsider = User::factory()->create();
+    $workspace = Workspace::create(['name' => 'Team', 'created_by' => $creator->id]);
+    $workspace->users()->attach($creator);
+
+    $this->actingAs($outsider)
+        ->delete(route('workspaces.leave', ['workspaceUuid' => $workspace->uuid]))
+        ->assertNotFound();
+});
