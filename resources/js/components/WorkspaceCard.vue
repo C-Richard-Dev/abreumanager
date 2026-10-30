@@ -8,7 +8,17 @@ import {
     destroy,
 } from '@/routes/workspaces';
 
-import { Edit, Eye, Trash2 } from '@lucide/vue';
+import { CalendarDays, Edit, Eye, FolderGit2, Trash2, User } from '@lucide/vue';
+
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 
@@ -49,47 +59,53 @@ function handleDelete() {
 </script>
 
 <template>
-    <div class="block rounded-lg border p-4 transition hover:bg-accent">
-        <h2 class="font-semibold">
-            {{ workspace.name }}
-        </h2>
+    <Card class="gap-4 transition hover:border-primary/40 hover:shadow-md">
+        <CardHeader class="flex flex-row items-center gap-3">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <FolderGit2 class="size-5" />
+            </div>
+            <div class="min-w-0">
+                <CardTitle class="truncate">{{ workspace.name }}</CardTitle>
+                <CardDescription class="flex items-center gap-1">
+                    <User class="size-3.5" />
+                    {{ workspace.creator.name }}
+                </CardDescription>
+            </div>
+        </CardHeader>
 
-        <p class="text-sm text-muted-foreground mb-0">
-            Criado em: {{ formatDate(workspace.created_at) }}
-        </p>
-        <p class="text-sm text-muted-foreground -mb-1">
-            Por {{ workspace.creator.name }}
-        </p>
+        <CardContent>
+            <p class="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <CalendarDays class="size-4" />
+                Criado em {{ formatDate(workspace.created_at) }}
+            </p>
+        </CardContent>
 
-        <div class="mt-4 flex flex-wrap gap-2">
-            <Link
-                :href="show(workspace.uuid).url"
-                class="inline-flex items-center rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-            >
-                Ver
+        <CardFooter class="flex flex-wrap gap-2 border-t pt-4">
+            <Button as-child size="sm">
+                <Link :href="show(workspace.uuid).url">
+                    <Eye class="size-4" />
+                    Ver
+                </Link>
+            </Button>
 
-                <Eye class="ml-2 size-4" />
-            </Link>
+            <Button as-child size="sm" variant="outline">
+                <Link :href="edit(workspace.uuid).url">
+                    <Edit class="size-4" />
+                    Editar
+                </Link>
+            </Button>
 
-            <Link
-                :href="edit(workspace.uuid).url"
-                class="inline-flex items-center rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-            >
-                Editar
-
-                <Edit class="ml-2 size-4" />
-            </Link>
-
-            <button
+            <Button
                 type="button"
-                class="inline-flex items-center rounded-sm px-5 py-1.5 text-sm leading-normal text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
+                size="sm"
+                variant="ghost"
+                class="ml-auto text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
                 @click="isDeleteModalOpen = true"
             >
+                <Trash2 class="size-4" />
                 Excluir
-
-                <Trash2 class="ml-2 size-4" />
-            </button>
-        </div>
+            </Button>
+        </CardFooter>
 
         <ConfirmDialog
             v-model:is-open="isDeleteModalOpen"
@@ -99,5 +115,5 @@ function handleDelete() {
             cancel-text="Cancelar"
             @confirm="handleDelete"
         />
-    </div>
+    </Card>
 </template>
