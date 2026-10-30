@@ -380,7 +380,7 @@ async function confirmDeleteLink() {
                     <div
                         v-for="linkItem in links"
                         :key="linkItem.uuid"
-                        class="group flex items-center justify-between gap-3 rounded-md border border-border bg-background p-3 transition-colors hover:border-muted-foreground/60 hover:bg-muted/20"
+                        class="group mb-2 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 shadow-xs transition hover:border-primary/40 hover:shadow-md"
                     >
                     <div class="flex min-w-0 items-center gap-3">
                         <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border/80 bg-muted/70 shadow-inner">
@@ -412,54 +412,55 @@ async function confirmDeleteLink() {
                                 </span>
                             </div>
 
-                            <a
-                                :href="linkItem.url"
-                                target="_blank"
-                                rel="noreferrer"
-                                class="mt-1 block truncate text-xs text-muted-foreground transition hover:text-foreground"
-                            >
-                                {{ linkItem.url }}
-                            </a>
+                            <div class="mt-1 flex min-w-0 items-center gap-1">
+                                <a
+                                    :href="linkItem.url"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    class="truncate text-xs text-muted-foreground transition hover:text-foreground"
+                                >
+                                    {{ linkItem.url }}
+                                </a>
+                                <button
+                                    type="button"
+                                    class="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                    @click="copyLink(linkItem)"
+                                    aria-label="Copiar link"
+                                    title="Copiar link"
+                                >
+                                    <Copy class="size-3.5" />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2">
                         <button
                             type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-muted hover:text-foreground"
                             @click="goToLink(linkItem)"
                             aria-label="Ir para o site"
                             title="Ir para o site"
                         >
-                            <ExternalLink class="size-3.5 text-purple-500" />
+                            <ExternalLink class="size-3.5" />
                         </button>
                         <button
                             type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
-                            @click="copyLink(linkItem)"
-                            aria-label="Copiar"
-                            title="Copiar"
-                        >
-                            <Copy class="size-3.5 text-blue-500" />
-                        </button>
-                        <button
-                            type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-muted hover:text-foreground"
                             @click="openEditLink(linkItem)"
                             aria-label="Editar link"
                             title="Editar link"
                         >
                             <Pencil class="size-3.5" />
                         </button>
-
                         <button
                             type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-background text-foreground transition hover:bg-muted"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200 bg-background text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30"
                             @click="openDeleteLink(linkItem)"
                             aria-label="Excluir link"
                             title="Excluir link"
                         >
-                            <Trash2 class="size-3.5 text-red-500" />
+                            <Trash2 class="size-3.5" />
                         </button>
                     </div>
                     </div>
