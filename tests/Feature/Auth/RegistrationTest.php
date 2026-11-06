@@ -26,7 +26,7 @@ test('new users can register', function () {
 
     $this->assertAuthenticated();
     $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('workspaces.index', absolute: false));
     Mail::assertSent(WelcomeEmail::class, fn (WelcomeEmail $mail): bool => $mail->hasTo('test@example.com'));
 });
 

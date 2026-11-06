@@ -35,8 +35,8 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { toUrl } from '@/lib/utils';
-import { dashboard } from '@/routes';
 import { index as usersIndex } from '@/routes/users';
+import { index as workspacesIndex } from '@/routes/workspaces';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -56,8 +56,8 @@ const activeItemStyles =
 
 const mainNavItems = computed<NavItem[]>(() => [
     {
-        title: 'Dashboard',
-        href: dashboard(),
+        title: 'Workspaces',
+        href: workspacesIndex(),
         icon: LayoutGrid,
     },
     ...(auth.value.user?.type === 'admin'
@@ -152,7 +152,10 @@ const rightNavItems: NavItem[] = [
                     </Sheet>
                 </div>
 
-                <Link :href="dashboard()" class="flex items-center gap-x-2">
+                <Link
+                    :href="workspacesIndex()"
+                    class="flex items-center gap-x-2"
+                >
                     <AppLogo />
                 </Link>
 

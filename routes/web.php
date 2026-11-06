@@ -41,10 +41,6 @@ Route::get('invite/success', ShowInviteSuccessController::class)
     ->name('invite.success');
 
 Route::middleware(['auth'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')
-        ->name('dashboard')
-        ->middleware(HaveWorkspace::class);
-
     Route::prefix('workspace')->group(function () {
         Route::get('/', ListWorkspaceController::class)
             ->name('workspaces.index')
