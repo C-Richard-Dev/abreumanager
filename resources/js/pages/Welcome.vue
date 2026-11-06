@@ -19,7 +19,7 @@ import { dashboard, login } from '@/routes';
         >
             <div class="flex items-center gap-3">
                 <span
-                    class="flex size-10 items-center justify-center rounded-xl bg-[#c9f36a] text-[#17231b]"
+                    class="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground"
                     aria-hidden="true"
                 >
                     <svg
@@ -88,7 +88,7 @@ import { dashboard, login } from '@/routes';
                             :href="
                                 $page.props.auth.user ? dashboard() : login()
                             "
-                            class="inline-flex items-center justify-center gap-3 rounded-full bg-[#c9f36a] px-7 py-4 font-semibold text-[#17231b] shadow-lg shadow-[#9fc958]/20 transition hover:-translate-y-0.5 hover:bg-[#b9e85c] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#709f32]"
+                            class="inline-flex items-center justify-center gap-3 rounded-full bg-primary px-7 py-4 font-semibold text-primary-foreground shadow-lg shadow-[#9fc958]/20 transition hover:-translate-y-0.5 hover:bg-[#b9e85c] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#709f32]"
                         >
                             Ir para aplicação
                             <svg
