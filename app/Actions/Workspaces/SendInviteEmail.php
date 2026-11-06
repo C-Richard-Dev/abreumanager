@@ -2,9 +2,9 @@
 
 namespace App\Actions\Workspaces;
 
+use App\Mail\WorkspaceInviteEmail;
 use App\Models\User;
 use App\Models\Workspace;
-use Illuminate\Mail\Message;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -58,13 +58,8 @@ class SendInviteEmail
 
             $linkToAccept = route('invite.show', ['token' => $token]);
 
-            $sentMessage = Mail::raw(
-                "{$sender->name} convidou você para ser membro do workspace \"{$workspace->name}\". Clique no link a seguir para aceitar o convite: ".$linkToAccept,
-                function (Message $message) use ($recipient, $workspace): void {
-                    $message
-                        ->to($recipient)
-                        ->subject('Convite para o workspace '.$workspace->name);
-                },
+            $sentMessage = Mail::to($recipient)->send(
+                new WorkspaceInviteEmail($workspace, $sender, $linkToAccept),
             );
         } catch (\Throwable $exception) {
             Cache::forget($cacheKey);

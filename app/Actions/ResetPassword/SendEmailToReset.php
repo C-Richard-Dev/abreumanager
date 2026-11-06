@@ -2,8 +2,8 @@
 
 namespace App\Actions\ResetPassword;
 
+use App\Mail\PasswordResetEmail;
 use App\Models\User;
-use Illuminate\Mail\Message;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -42,14 +42,7 @@ class SendEmailToReset
 
             $linkToReset = route('password.reset.form', ['token' => $token]);
 
-            $sentMessage = Mail::raw(
-                'Este é um e-mail solicitado para redefinição de senha. Clique no link a seguir para redefinir sua senha: '.$linkToReset,
-                function (Message $message) use ($recipient): void {
-                    $message
-                        ->to($recipient)
-                        ->subject('Redefinição de senha');
-                },
-            );
+            $sentMessage = Mail::to($recipient)->send(new PasswordResetEmail($linkToReset));
         } catch (\Throwable $exception) {
             Cache::forget($cacheKey);
 

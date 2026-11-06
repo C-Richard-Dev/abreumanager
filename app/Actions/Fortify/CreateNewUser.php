@@ -5,7 +5,9 @@ namespace App\Actions\Fortify;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Enums\UserType;
+use App\Mail\WelcomeEmail;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -26,12 +28,16 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'uuid' => $input['uuid'] ?? (string) Str::uuid(),
             'name' => $input['name'],
             'email' => $input['email'],
             'type' => $input['type'] ?? UserType::REGULAR->value,
             'password' => bcrypt($input['password'] ?? 'password'),
         ]);
+
+        Mail::to($user)->send(new WelcomeEmail($user));
+
+        return $user;
     }
 }

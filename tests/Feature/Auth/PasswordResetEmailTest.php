@@ -1,9 +1,12 @@
 <?php
 
+use App\Mail\PasswordResetEmail;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 test('forgot password form sends a reset email through the custom action', function () {
     $user = User::factory()->create();
+    Mail::fake();
 
     $response = $this->from(route('password.request'))
         ->post(route('password.send-reset-link'), ['email' => $user->email]);
@@ -15,6 +18,8 @@ test('forgot password form sends a reset email through the custom action', funct
     $this->assertDatabaseHas('password_reset_tokens', [
         'email' => $user->email,
     ]);
+
+    Mail::assertSent(PasswordResetEmail::class, fn (PasswordResetEmail $mail): bool => $mail->hasTo($user->email));
 });
 
 test('forgot password form shows an error when the email is not registered', function () {

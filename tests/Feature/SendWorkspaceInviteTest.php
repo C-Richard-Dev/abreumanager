@@ -1,5 +1,6 @@
 <?php
 
+use App\Mail\WorkspaceInviteEmail;
 use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Support\Facades\Mail;
@@ -20,6 +21,13 @@ it('sends an invite email and stores the invite token for a workspace member', f
         'workspace_id' => $workspace->id,
         'sender_id' => $sender->id,
     ]);
+
+    Mail::assertSent(
+        WorkspaceInviteEmail::class,
+        fn (WorkspaceInviteEmail $mail): bool => $mail->hasTo($guest->email)
+            && $mail->workspace->is($workspace)
+            && $mail->sender->is($sender),
+    );
 });
 
 it('rejects inviting someone who is already a member', function () {

@@ -1,7 +1,10 @@
 <?php
 
 use App\Actions\ResetPassword\SendEmailToReset;
+use App\Mail\PasswordResetEmail;
 use App\Models\User;
+use Illuminate\Mail\PendingMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 test('password reset email is blocked for the same recipient for one minute', function () {
@@ -36,9 +39,16 @@ test('password reset email can be retried immediately after a delivery failure',
     $user = User::factory()->create();
     $action = app(SendEmailToReset::class);
     $attempts = 0;
+    $pendingMail = Mockery::mock(PendingMail::class);
 
-    Mail::shouldReceive('raw')
+    Mail::shouldReceive('to')
         ->twice()
+        ->with($user->email)
+        ->andReturn($pendingMail);
+
+    $pendingMail->shouldReceive('send')
+        ->twice()
+        ->with(Mockery::type(PasswordResetEmail::class))
         ->andReturnUsing(function () use (&$attempts) {
             if ($attempts++ === 0) {
                 throw new RuntimeException('Falha ao enviar e-mail.');
