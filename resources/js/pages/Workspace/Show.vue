@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, LogOut } from '@lucide/vue';
+import { ArrowLeft, FolderGit2, LogOut } from '@lucide/vue';
 import { index, leave } from '@/routes/workspaces';
 import WorkspaceCategorySelector from '@/components/WorkspaceCategorySelector.vue';
 import WorkspaceLinksPanel from '@/components/WorkspaceLinksPanel.vue';
@@ -58,7 +58,9 @@ const page = usePage<{
 }>();
 
 const workspace = computed(() => page.props.workspace);
-const isWorkspaceCreator = computed(() => page.props.auth.user.id === workspace.value.created_by);
+const isWorkspaceCreator = computed(
+    () => page.props.auth.user.id === workspace.value.created_by,
+);
 const isLeaveModalOpen = ref(false);
 const categories = computed(() => page.props.categories ?? []);
 
@@ -119,7 +121,11 @@ const activeCategory = computed(() => {
         };
     }
 
-    return categoryOptions.value.find((category) => category.id === selectedCategoryId.value) ?? null;
+    return (
+        categoryOptions.value.find(
+            (category) => category.id === selectedCategoryId.value,
+        ) ?? null
+    );
 });
 
 const visibleLinks = computed(() => links.value);
@@ -141,11 +147,15 @@ function navigateToPage(pageNumber: number, nextSearchTerm = searchTerm.value) {
 
     params.set('page', String(pageNumber));
 
-    router.get(`${window.location.pathname}?${params.toString()}`, {}, {
-        preserveScroll: true,
-        preserveState: true,
-        only: ['categories', 'links', 'selectedCategoryId', 'searchQuery'],
-    });
+    router.get(
+        `${window.location.pathname}?${params.toString()}`,
+        {},
+        {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['categories', 'links', 'selectedCategoryId', 'searchQuery'],
+        },
+    );
 }
 
 function handleSearchChange(value: string) {
@@ -153,7 +163,11 @@ function handleSearchChange(value: string) {
     navigateToPage(1, value);
 }
 
-function handleCategoryCreated(category: { id: number; uuid: string; name: string }) {
+function handleCategoryCreated(category: {
+    id: number;
+    uuid: string;
+    name: string;
+}) {
     selectedCategoryId.value = category.id;
 
     navigateToPage(1);
@@ -168,17 +182,21 @@ function handleCategorySelected(categoryId: number) {
 <template>
     <Head :title="workspace.name" />
 
-    <div class="flex min-h-[calc(100vh-72px)] flex-col px-4 py-5 lg:px-8">
-        <div class="mb-5 flex items-center justify-between">
+    <div
+        class="mx-auto flex min-h-[calc(100vh-72px)] w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
+    >
+        <div
+            class="mb-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
             <Link
                 :href="index.url()"
-                class="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-sm font-medium leading-normal text-foreground transition hover:bg-muted"
+                class="inline-flex items-center gap-2 self-start rounded-md border border-border bg-background px-4 py-2 text-sm leading-normal font-medium text-foreground transition hover:border-primary/30 hover:bg-primary/10"
             >
                 <ArrowLeft class="size-4" />
                 Voltar
             </Link>
 
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                 <Button
                     v-if="!isWorkspaceCreator"
                     type="button"
@@ -198,14 +216,68 @@ function handleCategorySelected(categoryId: number) {
             </div>
         </div>
 
-        <div class="mb-5">
-            <h1 class="text-left text-3xl font-semibold tracking-tight text-foreground">
-                {{ workspace.name }}
-            </h1>
-            <p class="mt-2 text-left text-sm text-muted-foreground">
-                Selecione uma categoria para visualizar os links do workspace.
-            </p>
-        </div>
+        <section
+            class="relative isolate mb-6 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/20 via-background to-primary/5 p-5 shadow-sm sm:p-8"
+        >
+            <div
+                aria-hidden="true"
+                class="absolute -top-20 -right-12 size-56 rounded-full bg-primary/20 blur-3xl"
+            />
+
+            <div
+                class="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
+            >
+                <div class="flex items-start gap-4">
+                    <div
+                        class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm"
+                    >
+                        <FolderGit2 class="size-7" />
+                    </div>
+
+                    <div class="min-w-0">
+                        <span
+                            class="inline-flex items-center rounded-full border border-primary/25 bg-background/70 px-3 py-1 text-xs font-semibold tracking-wide text-primary"
+                        >
+                            Espaço de trabalho
+                        </span>
+                        <h1
+                            class="mt-3 text-2xl font-semibold tracking-tight break-words text-foreground sm:text-3xl"
+                        >
+                            {{ workspace.name }}
+                        </h1>
+                        <p
+                            class="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground"
+                        >
+                            Organize e encontre rapidamente os links importantes
+                            deste workspace.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 sm:justify-end">
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/75 px-4 py-2 text-sm text-foreground shadow-xs"
+                    >
+                        <span class="font-semibold">{{ linksPage.total }}</span>
+                        {{
+                            linksPage.total === 1
+                                ? 'link salvo'
+                                : 'links salvos'
+                        }}
+                    </div>
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/75 px-4 py-2 text-sm text-foreground shadow-xs"
+                    >
+                        <span class="font-semibold">{{
+                            categories.length
+                        }}</span>
+                        {{
+                            categories.length === 1 ? 'categoria' : 'categorias'
+                        }}
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <div>
             <WorkspaceCategorySelector

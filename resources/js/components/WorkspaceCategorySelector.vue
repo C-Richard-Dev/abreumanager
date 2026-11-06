@@ -30,7 +30,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (event: 'select-category', categoryId: number): void;
-    (event: 'category-created', category: { id: number; uuid: string; name: string }): void;
+    (
+        event: 'category-created',
+        category: { id: number; uuid: string; name: string },
+    ): void;
 }>();
 
 const isDropdownOpen = ref(false);
@@ -46,7 +49,13 @@ const editForm = ref({
 const isSubmitting = ref(false);
 
 const selectedCategory = computed(() => {
-    return props.categories.find((category) => category.id === props.selectedCategoryId) ?? props.categories[0] ?? null;
+    return (
+        props.categories.find(
+            (category) => category.id === props.selectedCategoryId,
+        ) ??
+        props.categories[0] ??
+        null
+    );
 });
 
 const selectedLabel = computed(() => {
@@ -116,32 +125,41 @@ async function submitCategoryUpdate() {
     try {
         isSubmitting.value = true;
 
-        const response = await fetch(`/categories/${editingCategory.value.uuid}/update`, {
-            method: 'PUT',
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'X-XSRF-TOKEN': getCsrfToken(),
-                'X-Requested-With': 'XMLHttpRequest',
+        const response = await fetch(
+            `/categories/${editingCategory.value.uuid}/update`,
+            {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'X-XSRF-TOKEN': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    name,
+                    description: editForm.value.description.trim() || null,
+                }),
             },
-            body: JSON.stringify({
-                name,
-                description: editForm.value.description.trim() || null,
-            }),
-        });
+        );
 
         if (!response.ok) {
             const payload = await response.json().catch(() => null);
-            throw new Error(payload?.message ?? 'Não foi possível atualizar a categoria.');
+            throw new Error(
+                payload?.message ?? 'Não foi possível atualizar a categoria.',
+            );
         }
 
         toast.success('Categoria atualizada com sucesso.');
         router.reload({ only: ['categories', 'links'] });
         closeEditCategory();
     } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Erro ao atualizar categoria.');
+        toast.error(
+            error instanceof Error
+                ? error.message
+                : 'Erro ao atualizar categoria.',
+        );
     } finally {
         isSubmitting.value = false;
     }
@@ -155,48 +173,63 @@ async function confirmDeleteCategory() {
     try {
         isSubmitting.value = true;
 
-        const response = await fetch(`/categories/${deleteCategory.value.uuid}/destroy`, {
-            method: 'DELETE',
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'X-XSRF-TOKEN': getCsrfToken(),
-                'X-Requested-With': 'XMLHttpRequest',
+        const response = await fetch(
+            `/categories/${deleteCategory.value.uuid}/destroy`,
+            {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'X-XSRF-TOKEN': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             },
-        });
+        );
 
         if (!response.ok) {
             const payload = await response.json().catch(() => null);
-            throw new Error(payload?.message ?? 'Não foi possível excluir a categoria.');
+            throw new Error(
+                payload?.message ?? 'Não foi possível excluir a categoria.',
+            );
         }
 
         toast.success('Categoria removida com sucesso.');
         router.reload({ only: ['categories', 'links'] });
         closeDeleteCategory();
     } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Erro ao excluir categoria.');
+        toast.error(
+            error instanceof Error
+                ? error.message
+                : 'Erro ao excluir categoria.',
+        );
     } finally {
         isSubmitting.value = false;
     }
 }
 
-function handleCategoryCreated(category: { id: number; uuid: string; name: string }) {
+function handleCategoryCreated(category: {
+    id: number;
+    uuid: string;
+    name: string;
+}) {
     emit('category-created', category);
 }
 </script>
 
 <template>
-    <div class="mb-5 flex items-center gap-2">
+    <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div class="relative flex-1">
             <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-sm border border-border bg-background px-4 py-2.5 text-left transition hover:bg-muted"
+                class="flex w-full items-center justify-between rounded-md border border-primary/20 bg-background px-4 py-2.5 text-left transition hover:border-primary/40 hover:bg-primary/5"
                 @click="isDropdownOpen = !isDropdownOpen"
             >
                 <div class="flex min-w-0 flex-col">
-                    <span class="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    <span
+                        class="text-[10px] font-medium tracking-[0.2em] text-primary uppercase"
+                    >
                         Categoria
                     </span>
                     <span class="truncate text-sm font-medium text-foreground">
@@ -209,16 +242,23 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
 
             <div
                 v-if="isDropdownOpen"
-                class="absolute left-0 top-full z-20 mt-2 w-full overflow-hidden rounded-sm border border-border bg-background shadow-sm"
+                class="absolute top-full left-0 z-20 mt-2 w-full overflow-hidden rounded-sm border border-border bg-background shadow-sm"
             >
                 <button
                     type="button"
-                    class="flex w-full items-center justify-between border-b border-border px-3 py-3 text-left transition hover:bg-muted"
+                    class="flex w-full items-center justify-between border-b border-border px-3 py-3 text-left transition hover:bg-primary/10"
+                    :class="{
+                        'bg-primary/10':
+                            selectedCategoryId === null ||
+                            selectedCategoryId === 0,
+                    }"
                     @click="selectCategory(0)"
                 >
                     <div>
                         <p class="text-sm font-medium text-foreground">Todas</p>
-                        <p class="text-[11px] text-muted-foreground">Todos os links do workspace</p>
+                        <p class="text-[11px] text-muted-foreground">
+                            Todos os links do workspace
+                        </p>
                     </div>
                 </button>
 
@@ -229,11 +269,16 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
                 >
                     <button
                         type="button"
-                        class="flex flex-1 items-center justify-between px-3 py-3 text-left transition hover:bg-muted"
+                        class="flex flex-1 items-center justify-between px-3 py-3 text-left transition hover:bg-primary/10"
+                        :class="{
+                            'bg-primary/10': selectedCategoryId === category.id,
+                        }"
                         @click="selectCategory(category.id)"
                     >
                         <div class="min-w-0">
-                            <p class="truncate text-sm font-medium text-foreground">
+                            <p
+                                class="truncate text-sm font-medium text-foreground"
+                            >
                                 {{ category.name }}
                             </p>
                             <p
@@ -248,7 +293,7 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
                     <div class="flex items-center gap-1 px-2">
                         <button
                             type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border text-foreground transition hover:bg-muted"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-foreground transition hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
                             @click.stop="openEditCategory(category)"
                             aria-label="Editar categoria"
                         >
@@ -269,7 +314,7 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
 
         <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted"
+            class="inline-flex items-center justify-center gap-2 rounded-md border border-primary/25 bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90"
             @click="isCreateCategoryDialogOpen = true"
         >
             <Plus class="size-4" />
@@ -283,70 +328,113 @@ function handleCategoryCreated(category: { id: number; uuid: string; name: strin
         @created="handleCategoryCreated"
     />
 
-    <Dialog :open="isEditCategoryDialogOpen" @update:open="isEditCategoryDialogOpen = $event">
+    <Dialog
+        :open="isEditCategoryDialogOpen"
+        @update:open="isEditCategoryDialogOpen = $event"
+    >
         <DialogContent class="sm:max-w-lg">
             <DialogHeader>
-                <DialogTitle class="text-left text-xl font-semibold text-foreground">
+                <DialogTitle
+                    class="text-left text-xl font-semibold text-foreground"
+                >
                     Editar categoria
                 </DialogTitle>
-                <DialogDescription class="text-left text-sm text-muted-foreground">
+                <DialogDescription
+                    class="text-left text-sm text-muted-foreground"
+                >
                     Ajuste o nome e a descrição desta categoria.
                 </DialogDescription>
             </DialogHeader>
 
             <div class="space-y-5 py-2">
                 <div class="space-y-2">
-                    <label for="edit-category-name" class="text-sm font-medium text-foreground">
+                    <label
+                        for="edit-category-name"
+                        class="text-sm font-medium text-foreground"
+                    >
                         Nome
                     </label>
                     <input
                         id="edit-category-name"
                         v-model="editForm.name"
                         type="text"
-                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     />
                 </div>
 
                 <div class="space-y-2">
-                    <label for="edit-category-description" class="text-sm font-medium text-foreground">
+                    <label
+                        for="edit-category-description"
+                        class="text-sm font-medium text-foreground"
+                    >
                         Descrição
                     </label>
                     <textarea
                         id="edit-category-description"
                         v-model="editForm.description"
                         rows="4"
-                        class="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     />
                 </div>
             </div>
 
             <DialogFooter class="gap-2 sm:justify-end">
-                <Button type="button" variant="outline" :disabled="isSubmitting" @click="closeEditCategory()">
+                <Button
+                    type="button"
+                    variant="outline"
+                    :disabled="isSubmitting"
+                    @click="closeEditCategory()"
+                >
                     Cancelar
                 </Button>
-                <Button type="button" :disabled="isSubmitting" @click="submitCategoryUpdate()">
+                <Button
+                    type="button"
+                    :disabled="isSubmitting"
+                    @click="submitCategoryUpdate()"
+                >
                     {{ isSubmitting ? 'Salvando...' : 'Salvar alterações' }}
                 </Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>
 
-    <Dialog :open="isDeleteCategoryDialogOpen" @update:open="isDeleteCategoryDialogOpen = $event">
+    <Dialog
+        :open="isDeleteCategoryDialogOpen"
+        @update:open="isDeleteCategoryDialogOpen = $event"
+    >
         <DialogContent class="sm:max-w-md">
             <DialogHeader>
-                <DialogTitle class="text-left text-xl font-semibold text-foreground">
+                <DialogTitle
+                    class="text-left text-xl font-semibold text-foreground"
+                >
                     Excluir categoria
                 </DialogTitle>
-                <DialogDescription class="text-left text-sm text-muted-foreground">
-                    Tem certeza que deseja remover <strong class="font-medium text-foreground">{{ deleteCategory?.name }}</strong>? Esta ação não pode ser desfeita.
+                <DialogDescription
+                    class="text-left text-sm text-muted-foreground"
+                >
+                    Tem certeza que deseja remover
+                    <strong class="font-medium text-foreground">{{
+                        deleteCategory?.name
+                    }}</strong
+                    >? Esta ação não pode ser desfeita.
                 </DialogDescription>
             </DialogHeader>
 
             <DialogFooter class="gap-2 sm:justify-end">
-                <Button type="button" variant="outline" :disabled="isSubmitting" @click="closeDeleteCategory()">
+                <Button
+                    type="button"
+                    variant="outline"
+                    :disabled="isSubmitting"
+                    @click="closeDeleteCategory()"
+                >
                     Cancelar
                 </Button>
-                <Button type="button" variant="destructive" :disabled="isSubmitting" @click="confirmDeleteCategory()">
+                <Button
+                    type="button"
+                    variant="destructive"
+                    :disabled="isSubmitting"
+                    @click="confirmDeleteCategory()"
+                >
                     {{ isSubmitting ? 'Excluindo...' : 'Excluir' }}
                 </Button>
             </DialogFooter>

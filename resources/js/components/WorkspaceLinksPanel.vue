@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Link as LinkIcon, Pencil, Plus, Trash2, Copy, ExternalLink, Search } from '@lucide/vue';
+import {
+    Link as LinkIcon,
+    Pencil,
+    Plus,
+    Trash2,
+    Copy,
+    ExternalLink,
+    Search,
+} from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
-import { destroy as destroyLink, store as storeLink, update as updateLink } from '@/routes/links';
+import {
+    destroy as destroyLink,
+    store as storeLink,
+    update as updateLink,
+} from '@/routes/links';
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
-
 
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
@@ -113,11 +124,13 @@ function getDomain(value: string): string {
 
         return domain || 'Link';
     } catch {
-        return value
-            .replace(/^https?:\/\//i, '')
-            .replace(/^www\./i, '')
-            .split('/')[0]
-            .trim() || 'Link';
+        return (
+            value
+                .replace(/^https?:\/\//i, '')
+                .replace(/^www\./i, '')
+                .split('/')[0]
+                .trim() || 'Link'
+        );
     }
 }
 
@@ -168,7 +181,9 @@ function getCategoryName(linkItem: LinkItem): string {
         return linkItem.category.name;
     }
 
-    const category = props.categories.find((item) => item.id === linkItem.category_id);
+    const category = props.categories.find(
+        (item) => item.id === linkItem.category_id,
+    );
 
     return category?.name ?? 'Sem categoria';
 }
@@ -242,7 +257,10 @@ async function submitLink() {
     const payload = {
         name: name || null,
         url,
-        category_id: form.value.category_id && form.value.category_id !== 0 ? form.value.category_id : null,
+        category_id:
+            form.value.category_id && form.value.category_id !== 0
+                ? form.value.category_id
+                : null,
     };
 
     const endpoint = editingLink.value
@@ -267,10 +285,16 @@ async function submitLink() {
 
         if (!response.ok) {
             const payloadError = await response.json().catch(() => null);
-            throw new Error(payloadError?.message ?? 'Não foi possível salvar o link.');
+            throw new Error(
+                payloadError?.message ?? 'Não foi possível salvar o link.',
+            );
         }
 
-        toast.success(editingLink.value ? 'Link atualizado com sucesso.' : 'Link criado com sucesso.');
+        toast.success(
+            editingLink.value
+                ? 'Link atualizado com sucesso.'
+                : 'Link criado com sucesso.',
+        );
         router.reload({ only: ['categories', 'links'] });
 
         if (editingLink.value) {
@@ -280,7 +304,9 @@ async function submitLink() {
 
         closeCreateDialog();
     } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Erro ao salvar o link.');
+        toast.error(
+            error instanceof Error ? error.message : 'Erro ao salvar o link.',
+        );
     } finally {
         isSubmitting.value = false;
     }
@@ -309,14 +335,18 @@ async function confirmDeleteLink() {
 
         if (!response.ok) {
             const payloadError = await response.json().catch(() => null);
-            throw new Error(payloadError?.message ?? 'Não foi possível excluir o link.');
+            throw new Error(
+                payloadError?.message ?? 'Não foi possível excluir o link.',
+            );
         }
 
         toast.success('Link removido com sucesso.');
         router.reload({ only: ['categories', 'links'] });
         closeDeleteDialog();
     } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Erro ao excluir o link.');
+        toast.error(
+            error instanceof Error ? error.message : 'Erro ao excluir o link.',
+        );
     } finally {
         isSubmitting.value = false;
     }
@@ -324,15 +354,21 @@ async function confirmDeleteLink() {
 </script>
 
 <template>
-    <section class="flex h-[530px] flex-col rounded-xl border border-border bg-background p-3 shadow-sm">
-        <div class="mb-3 flex items-center justify-between border-b border-border pb-3">
-            <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground">
+    <section
+        class="flex h-[530px] flex-col rounded-2xl border border-primary/15 bg-background p-4 shadow-sm sm:p-5"
+    >
+        <div
+            class="mb-4 flex items-center justify-between gap-3 border-b border-border pb-4"
+        >
+            <span
+                class="text-[11px] font-semibold tracking-[0.2em] text-primary uppercase"
+            >
                 Visualização
             </span>
 
             <button
                 type="button"
-                class="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-muted"
+                class="inline-flex items-center gap-2 rounded-md border border-primary/25 bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90"
                 @click="openCreateDialog()"
             >
                 <Plus class="size-4" />
@@ -347,14 +383,24 @@ async function confirmDeleteLink() {
         </div>
 
         <div class="mb-4">
-            <div class="flex w-full items-center gap-2 rounded-md border border-border bg-background px-3 py-2.5 transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
-                <Search class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <div
+                class="flex w-full items-center gap-2 rounded-md border border-border bg-background px-3 py-2.5 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+            >
+                <Search
+                    class="size-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                />
                 <input
                     :value="searchQuery ?? ''"
                     type="search"
                     placeholder="Pesquisar por nome ou link"
-                    class="min-w-0 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-                    @input="emit('search-change', ($event.target as HTMLInputElement).value)"
+                    class="w-full min-w-0 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    @input="
+                        emit(
+                            'search-change',
+                            ($event.target as HTMLInputElement).value,
+                        )
+                    "
                 />
             </div>
         </div>
@@ -364,7 +410,9 @@ async function confirmDeleteLink() {
                 v-if="links.length === 0"
                 class="flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center"
             >
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-foreground">
+                <div
+                    class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary"
+                >
                     <LinkIcon class="size-5" />
                 </div>
                 <p class="text-lg font-medium text-foreground">
@@ -382,93 +430,113 @@ async function confirmDeleteLink() {
                         :key="linkItem.uuid"
                         class="group mb-2 flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 shadow-xs transition hover:border-primary/40 hover:shadow-md"
                     >
-                    <div class="flex min-w-0 items-center gap-3">
-                        <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border/80 bg-muted/70 shadow-inner">
-                            <img
-                                v-if="!hasFaviconError(linkItem.uuid)"
-                                :src="getFaviconUrl(linkItem.url)"
-                                :alt="linkItem.name || getDomain(linkItem.url)"
-                                class="h-full w-full object-cover"
-                                loading="lazy"
-                                @error="onFaviconError(linkItem.uuid)"
-                            />
-
-                            <span
-                                v-else
-                                class="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-background text-[10px] font-semibold tracking-wide text-foreground"
+                        <div class="flex min-w-0 items-center gap-3">
+                            <div
+                                class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border/80 bg-muted/70 shadow-inner"
                             >
-                                {{ getInitials(linkItem.name || linkItem.url) }}
-                            </span>
-                        </div>
+                                <img
+                                    v-if="!hasFaviconError(linkItem.uuid)"
+                                    :src="getFaviconUrl(linkItem.url)"
+                                    :alt="
+                                        linkItem.name || getDomain(linkItem.url)
+                                    "
+                                    class="h-full w-full object-cover"
+                                    loading="lazy"
+                                    @error="onFaviconError(linkItem.uuid)"
+                                />
 
-                        <div class="min-w-0">
-                            <p class="truncate text-sm font-medium text-foreground">
-                                {{ linkItem.name || getDomain(linkItem.url) }}
-                            </p>
-
-                            <div class="mt-1 flex items-center gap-2">
-                                <span class="inline-flex max-w-full items-center rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                                    {{ getCategoryName(linkItem) }}
+                                <span
+                                    v-else
+                                    class="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-background text-[10px] font-semibold tracking-wide text-foreground"
+                                >
+                                    {{
+                                        getInitials(
+                                            linkItem.name || linkItem.url,
+                                        )
+                                    }}
                                 </span>
                             </div>
 
-                            <div class="mt-1 flex min-w-0 items-center gap-1">
-                                <a
-                                    :href="linkItem.url"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    class="truncate text-xs text-muted-foreground transition hover:text-foreground"
+                            <div class="min-w-0">
+                                <p
+                                    class="truncate text-sm font-medium text-foreground"
                                 >
-                                    {{ linkItem.url }}
-                                </a>
-                                <button
-                                    type="button"
-                                    class="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                                    @click="copyLink(linkItem)"
-                                    aria-label="Copiar link"
-                                    title="Copiar link"
+                                    {{
+                                        linkItem.name || getDomain(linkItem.url)
+                                    }}
+                                </p>
+
+                                <div class="mt-1 flex items-center gap-2">
+                                    <span
+                                        class="inline-flex max-w-full items-center rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium tracking-[0.12em] text-muted-foreground uppercase"
+                                    >
+                                        {{ getCategoryName(linkItem) }}
+                                    </span>
+                                </div>
+
+                                <div
+                                    class="mt-1 flex min-w-0 items-center gap-1"
                                 >
-                                    <Copy class="size-3.5" />
-                                </button>
+                                    <a
+                                        :href="linkItem.url"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        class="truncate text-xs text-muted-foreground transition hover:text-foreground"
+                                    >
+                                        {{ linkItem.url }}
+                                    </a>
+                                    <button
+                                        type="button"
+                                        class="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                        @click="copyLink(linkItem)"
+                                        aria-label="Copiar link"
+                                        title="Copiar link"
+                                    >
+                                        <Copy class="size-3.5" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex items-center gap-2">
-                        <button
-                            type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                            @click="goToLink(linkItem)"
-                            aria-label="Ir para o site"
-                            title="Ir para o site"
-                        >
-                            <ExternalLink class="size-3.5" />
-                        </button>
-                        <button
-                            type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                            @click="openEditLink(linkItem)"
-                            aria-label="Editar link"
-                            title="Editar link"
-                        >
-                            <Pencil class="size-3.5" />
-                        </button>
-                        <button
-                            type="button"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200 bg-background text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30"
-                            @click="openDeleteLink(linkItem)"
-                            aria-label="Excluir link"
-                            title="Excluir link"
-                        >
-                            <Trash2 class="size-3.5" />
-                        </button>
-                    </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                type="button"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                @click="goToLink(linkItem)"
+                                aria-label="Ir para o site"
+                                title="Ir para o site"
+                            >
+                                <ExternalLink class="size-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                @click="openEditLink(linkItem)"
+                                aria-label="Editar link"
+                                title="Editar link"
+                            >
+                                <Pencil class="size-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200 bg-background text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30"
+                                @click="openDeleteLink(linkItem)"
+                                aria-label="Excluir link"
+                                title="Excluir link"
+                            >
+                                <Trash2 class="size-3.5" />
+                            </button>
+                        </div>
                     </div>
                 </ScrollArea>
 
-                <div v-if="pagination && pagination.last_page > 1" class="mt-3 flex shrink-0 items-center justify-between border-t border-border pt-3">
+                <div
+                    v-if="pagination && pagination.last_page > 1"
+                    class="mt-3 flex shrink-0 items-center justify-between border-t border-border pt-3"
+                >
                     <span class="text-xs text-muted-foreground">
-                        {{ pagination.from }}-{{ pagination.to }} de {{ pagination.total }}
+                        {{ pagination.from }}-{{ pagination.to }} de
+                        {{ pagination.total }}
                     </span>
 
                     <div class="flex items-center gap-2">
@@ -476,15 +544,21 @@ async function confirmDeleteLink() {
                             type="button"
                             class="inline-flex items-center justify-center rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
                             :disabled="pagination.current_page <= 1"
-                            @click="emit('page-change', pagination.current_page - 1)"
+                            @click="
+                                emit('page-change', pagination.current_page - 1)
+                            "
                         >
                             Anterior
                         </button>
                         <button
                             type="button"
                             class="inline-flex items-center justify-center rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
-                            :disabled="pagination.current_page >= pagination.last_page"
-                            @click="emit('page-change', pagination.current_page + 1)"
+                            :disabled="
+                                pagination.current_page >= pagination.last_page
+                            "
+                            @click="
+                                emit('page-change', pagination.current_page + 1)
+                            "
                         >
                             Próxima
                         </button>
@@ -494,20 +568,30 @@ async function confirmDeleteLink() {
         </div>
     </section>
 
-    <Dialog :open="isCreateDialogOpen" @update:open="isCreateDialogOpen = $event">
+    <Dialog
+        :open="isCreateDialogOpen"
+        @update:open="isCreateDialogOpen = $event"
+    >
         <DialogContent class="sm:max-w-lg">
             <DialogHeader>
-                <DialogTitle class="text-left text-xl font-semibold text-foreground">
+                <DialogTitle
+                    class="text-left text-xl font-semibold text-foreground"
+                >
                     Novo link
                 </DialogTitle>
-                <DialogDescription class="text-left text-sm text-muted-foreground">
+                <DialogDescription
+                    class="text-left text-sm text-muted-foreground"
+                >
                     Adicione um novo link ao workspace e organize por categoria.
                 </DialogDescription>
             </DialogHeader>
 
             <div class="space-y-5 py-2">
                 <div class="space-y-2">
-                    <label for="link-name" class="text-sm font-medium text-foreground">
+                    <label
+                        for="link-name"
+                        class="text-sm font-medium text-foreground"
+                    >
                         Nome
                     </label>
                     <input
@@ -516,12 +600,15 @@ async function confirmDeleteLink() {
                         type="text"
                         maxlength="255"
                         placeholder="Ex: Dribbble, Notion, Figma"
-                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     />
                 </div>
 
                 <div class="space-y-2">
-                    <label for="link-url" class="text-sm font-medium text-foreground">
+                    <label
+                        for="link-url"
+                        class="text-sm font-medium text-foreground"
+                    >
                         URL
                     </label>
                     <input
@@ -529,18 +616,21 @@ async function confirmDeleteLink() {
                         v-model="form.url"
                         type="url"
                         placeholder="https://example.com"
-                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     />
                 </div>
 
                 <div class="space-y-2">
-                    <label for="link-category" class="text-sm font-medium text-foreground">
+                    <label
+                        for="link-category"
+                        class="text-sm font-medium text-foreground"
+                    >
                         Categoria
                     </label>
                     <select
                         id="link-category"
                         v-model="form.category_id"
-                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     >
                         <option :value="null">Sem categoria</option>
                         <option
@@ -577,17 +667,24 @@ async function confirmDeleteLink() {
     <Dialog :open="isEditDialogOpen" @update:open="isEditDialogOpen = $event">
         <DialogContent class="sm:max-w-lg">
             <DialogHeader>
-                <DialogTitle class="text-left text-xl font-semibold text-foreground">
+                <DialogTitle
+                    class="text-left text-xl font-semibold text-foreground"
+                >
                     Editar link
                 </DialogTitle>
-                <DialogDescription class="text-left text-sm text-muted-foreground">
+                <DialogDescription
+                    class="text-left text-sm text-muted-foreground"
+                >
                     Atualize as informações do link selecionado.
                 </DialogDescription>
             </DialogHeader>
 
             <div class="space-y-5 py-2">
                 <div class="space-y-2">
-                    <label for="edit-link-name" class="text-sm font-medium text-foreground">
+                    <label
+                        for="edit-link-name"
+                        class="text-sm font-medium text-foreground"
+                    >
                         Nome
                     </label>
                     <input
@@ -595,30 +692,36 @@ async function confirmDeleteLink() {
                         v-model="form.name"
                         type="text"
                         maxlength="255"
-                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     />
                 </div>
 
                 <div class="space-y-2">
-                    <label for="edit-link-url" class="text-sm font-medium text-foreground">
+                    <label
+                        for="edit-link-url"
+                        class="text-sm font-medium text-foreground"
+                    >
                         URL
                     </label>
                     <input
                         id="edit-link-url"
                         v-model="form.url"
                         type="url"
-                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     />
                 </div>
 
                 <div class="space-y-2">
-                    <label for="edit-link-category" class="text-sm font-medium text-foreground">
+                    <label
+                        for="edit-link-category"
+                        class="text-sm font-medium text-foreground"
+                    >
                         Categoria
                     </label>
                     <select
                         id="edit-link-category"
                         v-model="form.category_id"
-                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-foreground"
+                        class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition outline-none focus:border-foreground"
                     >
                         <option :value="null">Sem categoria</option>
                         <option
@@ -652,14 +755,22 @@ async function confirmDeleteLink() {
         </DialogContent>
     </Dialog>
 
-    <Dialog :open="isDeleteDialogOpen" @update:open="isDeleteDialogOpen = $event">
+    <Dialog
+        :open="isDeleteDialogOpen"
+        @update:open="isDeleteDialogOpen = $event"
+    >
         <DialogContent class="sm:max-w-md">
             <DialogHeader>
-                <DialogTitle class="text-left text-xl font-semibold text-foreground">
+                <DialogTitle
+                    class="text-left text-xl font-semibold text-foreground"
+                >
                     Excluir link
                 </DialogTitle>
-                <DialogDescription class="text-left text-sm text-muted-foreground">
-                    Tem certeza que deseja remover este link? Essa ação não pode ser desfeita.
+                <DialogDescription
+                    class="text-left text-sm text-muted-foreground"
+                >
+                    Tem certeza que deseja remover este link? Essa ação não pode
+                    ser desfeita.
                 </DialogDescription>
             </DialogHeader>
 

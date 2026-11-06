@@ -59,7 +59,8 @@ function removeMember() {
             preserveState: true,
             onSuccess: () => loadMembers(true),
             onError: (errors) => {
-                removalError.value = errors.member ?? 'Não foi possível remover o membro.';
+                removalError.value =
+                    errors.member ?? 'Não foi possível remover o membro.';
             },
             onFinish: () => {
                 isRemoveModalOpen.value = false;
@@ -100,132 +101,160 @@ async function loadMembers(open: boolean) {
 
 <template>
     <div>
-    <Sheet @update:open="loadMembers">
-        <SheetTrigger as-child>
-            <button
-                type="button"
-                class="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-sm font-medium leading-normal text-foreground transition hover:bg-muted"
-            >
-                <Users class="size-4" />
-                Ver Membros
-            </button>
-        </SheetTrigger>
-
-        <SheetContent side="right" class="w-full sm:max-w-sm">
-            <SheetHeader>
-                <SheetTitle>Membros ({{ members.length }})</SheetTitle>
-                <SheetDescription>
-                    Usuários com permissão para ver este workspace.
-                </SheetDescription>
-            </SheetHeader>
-
-            <div class="px-4">
-                <Button
-                    v-if="!isInviting"
+        <Sheet @update:open="loadMembers">
+            <SheetTrigger as-child>
+                <button
                     type="button"
-                    class="w-full gap-2"
-                    @click="isInviting = true"
+                    class="inline-flex items-center gap-2 rounded-md border border-primary/25 bg-primary px-4 py-2 text-sm leading-normal font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
-                    <UserPlus class="size-4" />
-                    Convidar Membro
-                </Button>
+                    <Users class="size-4" />
+                    Ver Membros
+                </button>
+            </SheetTrigger>
 
-                <Form
-                    v-else
-                    v-bind="invite.form(workspaceUuid)"
-                    reset-on-success
-                    :options="{ preserveScroll: true }"
-                    class="grid gap-3 rounded-md border border-border p-3"
-                    v-slot="{ errors, processing, clearErrors }"
-                    @success="isInviting = false"
-                >
-                    <div class="grid gap-2">
-                        <Label for="invite-email">E-mail do convidado</Label>
-                        <div class="relative">
-                            <Mail class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                id="invite-email"
-                                name="email"
-                                type="email"
-                                autofocus
-                                required
-                                placeholder="usuario@exemplo.com"
-                                class="pl-9"
-                            />
-                        </div>
-                        <InputError :message="errors.email" />
-                    </div>
+            <SheetContent side="right" class="w-full sm:max-w-sm">
+                <SheetHeader>
+                    <SheetTitle>Membros ({{ members.length }})</SheetTitle>
+                    <SheetDescription>
+                        Usuários com permissão para ver este workspace.
+                    </SheetDescription>
+                </SheetHeader>
 
-                    <div class="flex justify-end gap-2">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            @click="
-                                () => {
-                                    clearErrors();
-                                    isInviting = false;
-                                }
-                            "
-                        >
-                            Cancelar
-                        </Button>
-                        <Button type="submit" :disabled="processing">
-                            {{ processing ? 'Enviando...' : 'Enviar convite' }}
-                        </Button>
-                    </div>
-                </Form>
-            </div>
-
-            <div class="flex flex-col gap-2 px-4 pb-4 pt-4">
-                <template v-if="loading">
-                    <div v-for="i in 3" :key="i" class="h-14 animate-pulse rounded-md bg-muted" />
-                </template>
-
-                <p v-else-if="failed" class="text-sm text-destructive">
-                    Não foi possível carregar os participantes.
-                </p>
-
-                <p v-else-if="members.length === 0" class="text-sm text-muted-foreground">
-                    Nenhum participante encontrado.
-                </p>
-
-                <ul v-else class="flex flex-col gap-2">
-                    <li
-                        v-for="member in members"
-                        :key="member.uuid"
-                        class="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                <div class="px-4">
+                    <Button
+                        v-if="!isInviting"
+                        type="button"
+                        class="w-full gap-2"
+                        @click="isInviting = true"
                     >
-                        <div class="min-w-0">
-                            <p class="truncate text-sm font-medium text-foreground">{{ member.name }}</p>
-                            <p class="truncate text-xs text-muted-foreground">{{ member.email }}</p>
+                        <UserPlus class="size-4" />
+                        Convidar Membro
+                    </Button>
+
+                    <Form
+                        v-else
+                        v-bind="invite.form(workspaceUuid)"
+                        reset-on-success
+                        :options="{ preserveScroll: true }"
+                        class="grid gap-3 rounded-md border border-border p-3"
+                        v-slot="{ errors, processing, clearErrors }"
+                        @success="isInviting = false"
+                    >
+                        <div class="grid gap-2">
+                            <Label for="invite-email"
+                                >E-mail do convidado</Label
+                            >
+                            <div class="relative">
+                                <Mail
+                                    class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                                />
+                                <Input
+                                    id="invite-email"
+                                    name="email"
+                                    type="email"
+                                    autofocus
+                                    required
+                                    placeholder="usuario@exemplo.com"
+                                    class="pl-9"
+                                />
+                            </div>
+                            <InputError :message="errors.email" />
                         </div>
 
-                        <Button
-                            v-if="canRemoveMembers && member.uuid !== currentUserUuid"
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            class="shrink-0 text-destructive"
-                            :aria-label="`Remover ${member.name}`"
-                            @click="askToRemove(member)"
+                        <div class="flex justify-end gap-2">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                @click="
+                                    () => {
+                                        clearErrors();
+                                        isInviting = false;
+                                    }
+                                "
+                            >
+                                Cancelar
+                            </Button>
+                            <Button type="submit" :disabled="processing">
+                                {{
+                                    processing
+                                        ? 'Enviando...'
+                                        : 'Enviar convite'
+                                }}
+                            </Button>
+                        </div>
+                    </Form>
+                </div>
+
+                <div class="flex flex-col gap-2 px-4 pt-4 pb-4">
+                    <template v-if="loading">
+                        <div
+                            v-for="i in 3"
+                            :key="i"
+                            class="h-14 animate-pulse rounded-md bg-muted"
+                        />
+                    </template>
+
+                    <p v-else-if="failed" class="text-sm text-destructive">
+                        Não foi possível carregar os participantes.
+                    </p>
+
+                    <p
+                        v-else-if="members.length === 0"
+                        class="text-sm text-muted-foreground"
+                    >
+                        Nenhum participante encontrado.
+                    </p>
+
+                    <ul v-else class="flex flex-col gap-2">
+                        <li
+                            v-for="member in members"
+                            :key="member.uuid"
+                            class="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
                         >
-                            <Trash2 class="size-4" />
-                        </Button>
-                    </li>
-                </ul>
+                            <div class="min-w-0">
+                                <p
+                                    class="truncate text-sm font-medium text-foreground"
+                                >
+                                    {{ member.name }}
+                                </p>
+                                <p
+                                    class="truncate text-xs text-muted-foreground"
+                                >
+                                    {{ member.email }}
+                                </p>
+                            </div>
 
-                <p v-if="removalError" class="text-sm text-destructive">{{ removalError }}</p>
-            </div>
-        </SheetContent>
-    </Sheet>
+                            <Button
+                                v-if="
+                                    canRemoveMembers &&
+                                    member.uuid !== currentUserUuid
+                                "
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                class="shrink-0 text-destructive"
+                                :aria-label="`Remover ${member.name}`"
+                                @click="askToRemove(member)"
+                            >
+                                <Trash2 class="size-4" />
+                            </Button>
+                        </li>
+                    </ul>
 
-    <ConfirmDialog
-        v-model:is-open="isRemoveModalOpen"
-        title="Remover membro"
-        :message="`Tem certeza que deseja remover '${memberToRemove?.name ?? ''}' do workspace?`"
-        confirm-text="Remover"
-        cancel-text="Cancelar"
-        @confirm="removeMember"
-    />
+                    <p v-if="removalError" class="text-sm text-destructive">
+                        {{ removalError }}
+                    </p>
+                </div>
+            </SheetContent>
+        </Sheet>
+
+        <ConfirmDialog
+            v-model:is-open="isRemoveModalOpen"
+            title="Remover membro"
+            :message="`Tem certeza que deseja remover '${memberToRemove?.name ?? ''}' do workspace?`"
+            confirm-text="Remover"
+            cancel-text="Cancelar"
+            @confirm="removeMember"
+        />
     </div>
 </template>
